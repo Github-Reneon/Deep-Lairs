@@ -34,10 +34,11 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	user := user.User{
 		ID:           uuid.New().String(),
 		MessageQueue: make([]string, 0),
+		Name:         "Reneon",
 	}
 
 	user.MessageQueue = append(user.MessageQueue, fmt.Sprintf("User %s connected", user.ID))
-	debugIncomingMessage := fmt.Sprintf(protocol.LOOK_MESSAGE, "You see a tavern wench", "drinks.webp")
+	debugIncomingMessage := fmt.Sprintf(protocol.LOOK, "You see the king of the castle", "king.webp")
 	user.MessageQueue = append(user.MessageQueue, debugIncomingMessage)
 
 	wg := sync.WaitGroup{}
@@ -90,9 +91,25 @@ func handleIncomingMessages(conn *websocket.Conn, wg *sync.WaitGroup, user *user
 
 		switch firstWord {
 		case "say", "s":
-			user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.SAY, user.GetName(), strings.Join(splitMsg[1:], " ")))
+			if len(splitMsg) < 2 {
+				user.MessageQueue = append(user.MessageQueue, "Usage: say <message>")
+			} else {
+				user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.SAY, user.GetName(), strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:]))
+			}
+		case "shout", "sh":
+			if len(splitMsg) < 2 {
+				user.MessageQueue = append(user.MessageQueue, "Usage: shout <message>")
+			} else {
+				user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.SHOUT, user.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
+			}
 		case "look", "l":
-			user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.LOOK_MESSAGE, "You see a tavern wench", "drinks.webp"))
+			if len(splitMsg) > 1 {
+				user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "look "+strings.Join(splitMsg[1:], " ")))
+			} else {
+				user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.LOOK, "You see a tavern wench", "drinks.webp"))
+			}
+		case "quick_look", "ql":
+			user.MessageQueue = append(user.MessageQueue, fmt.Sprintf(protocol.LOOK_NO_IMAGE, "You see a tavern wench"))
 		case "set_name":
 			if len(splitMsg) == 2 {
 				user.Name = splitMsg[1]
@@ -100,6 +117,10 @@ func handleIncomingMessages(conn *websocket.Conn, wg *sync.WaitGroup, user *user
 			} else {
 				user.MessageQueue = append(user.MessageQueue, "Usage: set_name <name>")
 			}
+		case "where", "w":
+			user.MessageQueue = append(user.MessageQueue, "You are in a tavern.<br>There are many people here.<br>You can go <b>south</b>.")
+		case "time", "t":
+			user.MessageQueue = append(user.MessageQueue, fmt.Sprintf("Current server time: %s", time.Now().Format(time.RFC1123)))
 		case "help":
 			user.MessageQueue = append(user.MessageQueue, "Available commands: say, look, set_name, help")
 		default:
