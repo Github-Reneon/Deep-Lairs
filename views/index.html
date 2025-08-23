@@ -55,6 +55,7 @@
     function appendOutput(text) {
       const p = document.createElement("p");
       p.innerHTML = text;
+      p.classList.add("mb-2", "starting:opacity-0", "opacity-100", "transition-all", "duration-400", "delay-100", "ease-in-out");
       lairsDiv.appendChild(p);
       lairsContainer.scrollTop = lairsContainer.scrollHeight; // Auto-scroll to the bottom
     }
@@ -69,6 +70,11 @@
           lairInput.value = "";
         }
       }
+    });
+
+    // when a key on the keyboard is pressed focus on the input
+    document.addEventListener("keydown", () => {
+      lairInput.focus();
     });
 
     connect();
