@@ -2,6 +2,7 @@ package gameobjects
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -63,6 +64,40 @@ func (p *Place) GetDirection(direction string) (*Place, error) {
 	return nextPlace, nil
 }
 
+func (p *Place) RemoveMessage(msg string) {
+	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+
+	p.Messages = p.Messages[1:]
+}
+
+func (p *Place) RemoveUser(user *User) {
+	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+
+	delete(p.Users, user.ID)
+}
+
+func (p *Place) StartMessageHandler() {
+	for {
+		time.Sleep(time.Second * 1)
+		if len(p.Messages) > 0 {
+			log.Println("Sending messages to users in place:", p.Name)
+			for _, message := range p.Messages {
+				// Send the message to all users in the place
+				for _, user := range p.Users {
+					user.AddMessage(message)
+				}
+				p.RemoveMessage(message)
+			}
+		}
+	}
+}
+
 func GetUser(world *World, id string) *User {
 	for _, place := range world.Places {
 		if user, ok := place.Users[id]; ok {
@@ -72,11 +107,14 @@ func GetUser(world *World, id string) *User {
 	return nil
 }
 
-func (w *World) AddJingles() {
-	for _, place := range w.Places {
-		// random jingle add message
-		jingle := place.Jingles[rand.Intn(len(place.Jingles))]
-		place.AddMessage(jingle)
-		time.Sleep(time.Second * time.Duration(rand.Intn(11)+5))
+func (w *World) StartJingleHandler() {
+	for {
+		time.Sleep(time.Minute)
+		log.Println("Sending jingles to all places")
+		for _, place := range w.Places {
+			// random jingle add message
+			jingle := place.Jingles[rand.Intn(len(place.Jingles))]
+			place.AddMessage(jingle)
+		}
 	}
 }

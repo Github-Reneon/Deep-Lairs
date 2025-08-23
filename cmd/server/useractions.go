@@ -34,10 +34,15 @@ func UserSay(splitMsg []string, user *gameobjects.User) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: say <message>")
 	} else {
-		user.AddMessage(fmt.Sprintf(protocol.SAY, user.GetName(), strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:]))
+		message := fmt.Sprintf(
+			protocol.SAY,
+			user.GetName(),
+			strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:],
+		)
+		user.AddMessage(message)
 		for _, u := range user.Location.Users {
 			if u != user {
-				u.AddMessage(fmt.Sprintf(protocol.SAY, user.GetName(), strings.Join(splitMsg[1:], " ")))
+				u.AddMessage(message)
 			}
 		}
 	}
@@ -54,7 +59,7 @@ func UserLook(splitMsg []string, user *gameobjects.User) {
 				users = append(users, foundUser.GetName())
 			}
 		}
-		if len(users) > 0 {
+		if len(users) >= 1 {
 			if len(users) >= 10 {
 				user.AddMessage(fmt.Sprintf("You see many adventurers here. %d in total.", len(users)))
 			}

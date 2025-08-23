@@ -24,6 +24,10 @@ func InitPlace() *gameobjects.Place {
 			"A mysterious figure in a hooded cloak sits in the corner, observing everyone... don't pay too much attention to them. They're looking for someone shorter than you.",
 			"The fireplace crackles warmly, casting dancing shadows on the walls.",
 			"Someone is getting handsy with the tavern wench... she hits back!",
+			"A bar fight breaks out! Chairs are flying and people are shouting.",
+			"A fledgling mage casts a spell, causing a small explosion in the corner!",
+			"A cat jumps onto a table, knocking over drinks.",
+			"You feel as if it's all going to be all right.",
 		},
 	}
 }

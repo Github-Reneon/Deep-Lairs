@@ -81,6 +81,8 @@ func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				message = user.MessageQueue[0]
 				if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 					log.Println("Error writing message:", err)
+					user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
+					user.Location.RemoveUser(user)
 					return err
 				} else {
 					user.ClearLastMessage()
@@ -101,6 +103,8 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("Error reading message:", err)
+				user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
+				user.Location.RemoveUser(user)
 				return err
 			}
 			log.Printf("Received message: %s\n", msg)
@@ -151,6 +155,9 @@ func main() {
 
 	// Initialize world with default places
 	world.Places["tavern"] = InitPlace()
+	go world.Places["tavern"].StartMessageHandler()
+	go world.StartJingleHandler()
+
 	if err := http.ListenAndServe(":3000", nil); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
