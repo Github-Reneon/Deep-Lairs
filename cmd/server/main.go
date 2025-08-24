@@ -40,11 +40,11 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	id := uuid.New().String()
 
-	world.Places["tavern"].Users[id] = &gameobjects.User{
+	world.Places["tavern"].AddUser(&gameobjects.User{
 		ID:       id,
 		Name:     "Reneon",
 		Location: world.Places["tavern"],
-	}
+	})
 
 	user := gameobjects.GetUser(&world, id)
 
@@ -107,8 +107,6 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				user.Location.RemoveUser(user)
 				return err
 			}
-			log.Printf("Received message: %s\n", msg)
-
 			// basic parse message replace soon
 			// split on spaces
 			if string(msg) == "" {
@@ -124,9 +122,14 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 			case "shout", "sh":
 				UserShout(splitMsg, user)
 			case "look", "l":
-				UserLook(splitMsg, user)
+				if !user.Looked {
+					UserLook(splitMsg, user)
+					user.Looked = true
+				} else {
+					UserQuickLook(splitMsg, user)
+				}
 			case "quick_look", "ql":
-				user.AddMessage(fmt.Sprintf(protocol.LOOK_NO_IMAGE, user.Location.QuickLook))
+				UserQuickLook(splitMsg, user)
 			case "set_name":
 				if len(splitMsg) == 2 {
 					user.Name = splitMsg[1]
@@ -151,14 +154,21 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 
 func main() {
 	http.HandleFunc("/ws", handleConnections)
-	fmt.Println("Server started on :3000")
+	fmt.Println("Server started on", protocol.PORT)
 
 	// Initialize world with default places
+	// Replace this later
 	world.Places["tavern"] = InitPlace()
-	go world.Places["tavern"].StartMessageHandler()
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+	// Set message threads for each place
+	for _, place := range world.Places {
+		go place.StartMessageHandler()
+		//go place.StartCheckUsersHandler()
+	}
 	go world.StartJingleHandler()
 
-	if err := http.ListenAndServe(":3000", nil); err != nil {
+	if err := http.ListenAndServe(protocol.PORT, nil); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 }

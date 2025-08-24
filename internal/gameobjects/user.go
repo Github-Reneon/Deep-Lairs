@@ -9,6 +9,7 @@ type User struct {
 	Name         string
 	Location     *Place
 	MessageQueue []string
+	Looked       bool
 }
 
 func (u *User) GetName() string {

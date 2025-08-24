@@ -1,13 +1,16 @@
 package main
 
-import "deep_lairs/internal/gameobjects"
+import (
+	"deep_lairs/internal/gameobjects"
+	"deep_lairs/internal/protocol"
+)
 
 func InitPlace() *gameobjects.Place {
 	return &gameobjects.Place{
 		ID:          "tavern",
 		Name:        "The Lofty Tavern",
 		Description: "A cozy tavern with warm lighting.",
-		QuickLook:   "You see a tavern wench. She is serving drinks.",
+		TitleLook:   "You see a tavern wench. She is serving drinks.",
 		Look: "There is a fireplace in the corner." +
 			" Everyone seems to be enjoying themselves. Soft but lively music plays in the background.",
 		LocationImage:    "tavern.webp",
@@ -15,6 +18,7 @@ func InitPlace() *gameobjects.Place {
 		Users:            make(map[string]*gameobjects.User),
 		Messages:         make([]string, 0),
 		JoiningLocations: make(map[string]*gameobjects.Place),
+		JoiningMessage:   protocol.STUMBLES_IN,
 		Jingles: []string{
 			"Someone falls over.",
 			"A bard starts playing a lively tune.",
