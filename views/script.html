@@ -1,0 +1,83 @@
+{{ define "script" }}
+<script>
+    const lairsDiv = document.getElementById("lairs");
+    const lairsContainer = document.getElementById("lairs_container");
+
+    function connect() {
+      lairsDiv.innerHTML = "";
+      ws = new WebSocket("ws://localhost:3000/ws");
+
+      ws.onopen = () => {
+        appendOutput("Connected to the server.");
+      };
+
+      ws.onclose = () => {
+        appendOutput("Disconnected from the server.");
+        setTimeout(() => {
+          connect();
+        }, 3000);
+      };
+
+      ws.onmessage = (event) => {
+        // if event.data is json
+        try {
+          const data = JSON.parse(event.data);
+          setStateView(data)
+        } catch (error) {
+          appendOutput(event.data);
+        }
+      };
+
+      ws.onerror = (error) => {
+        appendOutput("Disconnected from the server.");
+        ws.close();
+      };
+    }
+
+    function appendOutput(text) {
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      p.classList.add("mb-2", "starting:opacity-0", "opacity-100", "transition-all", "duration-400", "delay-100", "ease-in-out");
+      lairsDiv.appendChild(p);
+      // wait for the animation to finish
+      setTimeout(() => {
+        lairsContainer.scrollTop = lairsContainer.scrollHeight; // Auto-scroll to the bottom
+      }, 400);
+    }
+
+    function setStateView(state) {
+      document.getElementById("Name").innerText = state.name;
+      document.getElementById("Health").innerText = state.hp;
+      document.getElementById("Mana").innerText = state.mp;
+      document.getElementById("Stamina").innerText = state.stamina;
+      document.getElementById("XP").innerText = state.xp;
+
+      if (state.combat) {
+        document.getElementById("enemy-status-bar").classList.remove("hidden");
+      } else {
+        document.getElementById("enemy-status-bar").classList.add("hidden");
+      }
+    }
+
+    // on pressing enter if lair input is focused
+    const lairInput = document.getElementById("lair-input");
+    lairInput.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        const message = lairInput.value;
+        if (message) {
+          ws.send(message);
+          lairInput.value = "";
+        }
+      }
+    });
+
+    // when a key on the keyboard is pressed focus on the input
+    document.addEventListener("keydown", () => {
+      lairInput.focus();
+    });
+
+    connect();
+
+  </script>
+
+{{end}}

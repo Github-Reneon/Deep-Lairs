@@ -138,16 +138,7 @@ func UserSearch(splitMsg []string, user *gameobjects.User) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "search "+strings.Join(splitMsg[1:], " ")))
 	} else {
-		for direction, place := range user.Location.JoiningLocations {
-			found := false
-			if slices.Contains(user.KnownLocations, place) {
-				user.AddMessage(fmt.Sprintf("%s is %s", place.Name, direction))
-				found = true
-			}
-			if !found {
-				user.AddMessage(fmt.Sprintf("You find an exit going %s.", direction))
-			}
-		}
+		go user.Search()
 	}
 }
 
@@ -174,4 +165,91 @@ func UserQuestBoard(splitMsg []string, user *gameobjects.User) {
 			user.AddMessage(b.String())
 		}
 	}
+}
+
+// TODO
+func SendUserState(user *gameobjects.User) {
+	user.AddMessage(user.GetState())
+}
+
+func UserInventory(user *gameobjects.User) {
+	if len(user.Items) == 0 {
+		user.AddMessage("Your inventory is empty.")
+	} else {
+		b := strings.Builder{}
+		b.WriteString("You have the following items in your inventory:<br><span class=\"inline-grid grid-cols-5 gap-4\">")
+		for _, item := range user.Items {
+			if slices.Contains(user.Equipped, item) {
+				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-green-700 rounded-lg\">%s (equipped)</span>", item.Name))
+			} else {
+				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-gray-900 rounded-lg\">%s</span>", item.Name))
+			}
+		}
+		b.WriteString("</span>")
+		user.AddMessage(b.String())
+	}
+}
+
+func UserEquip(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) < 2 {
+		user.AddMessage("Usage: equip <item>")
+		return
+	}
+	itemName := strings.Join(splitMsg[1:], " ")
+	item, notFound := findItem(user, itemName)
+	if notFound {
+		user.AddMessage("Item not found.")
+		return
+	}
+	if slices.Contains(user.Equipped, item) {
+		user.AddMessage("You are already wearing that item.")
+		return
+	}
+	for _, equippedItem := range user.Equipped {
+		if equippedItem.Slot == item.Slot {
+			user.AddMessage(fmt.Sprintf("You are already wearing the following item: %s, which is in the same item slot.", equippedItem.Name))
+			return
+		}
+	}
+	user.EquipItem(item)
+}
+
+func findItem(user *gameobjects.User, itemName string) (*gameobjects.Item, bool) {
+	var item *gameobjects.Item
+	for _, i := range user.Items {
+		if i.Name == itemName {
+			item = i
+			break
+		}
+	}
+	if item == nil {
+		// search tags
+		for _, i := range user.Items {
+			if slices.Contains(i.Tags, itemName) {
+				item = i
+				break
+			}
+		}
+	}
+	if item == nil {
+		return nil, true
+	}
+	return item, false
+}
+
+func UserUnequip(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) < 2 {
+		user.AddMessage("Usage: unequip <item>")
+		return
+	}
+	itemName := strings.Join(splitMsg[1:], " ")
+	item, shouldReturn := findItem(user, itemName)
+	if shouldReturn {
+		return
+	}
+	if !slices.Contains(user.Equipped, item) {
+		user.AddMessage("You are not wearing that item.")
+		return
+	}
+	user.UnequipItem(item)
 }

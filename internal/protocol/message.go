@@ -1,16 +1,16 @@
 package protocol
 
 // types
-var (
+const (
 	TYPE_MESSAGE = "message"
 )
 
-var (
+const (
 	PORT = ":3000"
 )
 
 // format types for sprintf
-var (
+const (
 	LOOK               = "<b>%s</b> %s<br><img src=\"/img/%s\" class=\"img-fluid w-100 m-4 rounded-lg starting:opacity-0 opacity-100 transition-all duration-700 delay-200 ease-in-out \" />"
 	LOOK_NO_IMAGE      = "<b>%s</b> %s"
 	SAY                = "%s says: \"%s\""
@@ -29,7 +29,7 @@ type Message struct {
 }
 
 // joining messages
-var (
+const (
 	JOINING_MESSAGE           = "%s has arrived."
 	JOINING_STUMBLES_IN       = "%s stumbles in."
 	JOINING_CREEPS_IN         = "%s creeps in."
@@ -37,9 +37,14 @@ var (
 )
 
 // Leaving messages
-var (
+const (
 	LEAVING_MESSAGE           = "%s has left, going %s."
 	LEAVING_STUMBLES_OUT      = "%s stumbles out, going %s."
 	LEAVING_CREEPS_OUT        = "%s creeps out, going %s."
 	LEAVING_ENTERS_CAUTIOUSLY = "%s leaves cautiously, going %s."
+)
+
+const (
+	STATE_TYPE_USER  = "user"
+	STATE_TYPE_ENEMY = "enemy"
 )

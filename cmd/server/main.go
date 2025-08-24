@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:    1024,
 	WriteBufferSize:   1024,
 	CheckOrigin:       func(r *http.Request) bool { return true },
-	EnableCompression: false,
+	EnableCompression: true,
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,16 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	})
 
 	user := gameobjects.GetUser(&world, id)
+	// health int, attack int, defense int, mana int, stamina int
+	user.InitFightable(
+		7, // health
+		5, // attack
+		5, // defense
+		1, // mana
+		1, // stamina
+		3, // speed
+		1, // intelligence
+	)
 
 	user.AddKnownLocation(world.Places["tavern"])
 
@@ -54,6 +65,9 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	g, ctx := errgroup.WithContext(context.Background())
 
 	UserJoin(user)
+
+	go user.StartCalcStatsHandler()
+	SendUserState(user)
 
 	defer conn.Close()
 
@@ -139,6 +153,7 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					user.AddMessage("Usage: set_name <name>")
 				}
+				SendUserState(user)
 			case "go", "g":
 				knownLocation, err := UserGo(splitMsg, user)
 				if err != nil {
@@ -150,6 +165,26 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					UserWhere(splitMsg, user)
 				}
+			case "givexp":
+				if len(splitMsg) == 2 {
+					amount, err := strconv.Atoi(splitMsg[1])
+					if err != nil {
+						user.AddMessage("Invalid XP amount.")
+					} else {
+						user.XP += amount
+					}
+				} else {
+					user.AddMessage("Usage: givexp <amount>")
+				}
+				SendUserState(user)
+			case "flipcombat":
+				user.InCombat = !user.InCombat
+				if user.InCombat {
+					user.AddMessage("You are now in combat.")
+				} else {
+					user.AddMessage("You are no longer in combat.")
+				}
+				SendUserState(user)
 			case "where", "w":
 				UserWhere(splitMsg, user)
 			case "time", "t":
@@ -162,6 +197,12 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				UserLaugh(user)
 			case "se", "search":
 				UserSearch(splitMsg, user)
+			case "i", "inv", "inventory":
+				UserInventory(user)
+			case "equip", "eq":
+				UserEquip(splitMsg, user)
+			case "unequip", "ue":
+				UserUnequip(splitMsg, user)
 			default:
 				user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, firstWord))
 			}

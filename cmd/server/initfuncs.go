@@ -60,6 +60,10 @@ func InitTownSquarePlace() *gameobjects.Place {
 		LeavingMessage: protocol.LEAVING_MESSAGE,
 		Quests: []gameobjects.Quest{
 			{
+				ID:   "fake quests",
+				Name: "These are all fake quests",
+			},
+			{
 				ID:   "fetch_herbs",
 				Name: "Fetch Herbs",
 			},
