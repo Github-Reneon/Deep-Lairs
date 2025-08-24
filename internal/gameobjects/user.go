@@ -1,6 +1,7 @@
 package gameobjects
 
 import (
+	"log"
 	"slices"
 	"sync"
 )
@@ -59,4 +60,18 @@ func (u *User) AddKnownLocation(location *Place) {
 		return
 	}
 	u.KnownLocations = append(u.KnownLocations, location)
+}
+
+func (u *User) IsKnownLocation(location *Place) bool {
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	for _, knownLocation := range u.KnownLocations {
+		if knownLocation.ID == location.ID {
+			log.Println("Found matching known location:", knownLocation.ID)
+			return true
+		}
+	}
+	return false
 }

@@ -12,7 +12,7 @@ func InitTavernPlace() *gameobjects.Place {
 		Description: "A cozy tavern with warm lighting.",
 		TitleLook:   "You see a tavern wench. She is serving drinks.",
 		Look: "There is a fireplace in the corner." +
-			" Everyone seems to be enjoying themselves. Soft but lively music plays in the background.",
+			" Everyone seems to be enjoying themselves. Soft but lively music plays in the background. The town square is just <span class=\"font-bold underline\">out</span>side.",
 		LocationImage:    "tavern.webp",
 		LookImage:        "drinks.webp",
 		Users:            make(map[string]*gameobjects.User),
@@ -58,5 +58,35 @@ func InitTownSquarePlace() *gameobjects.Place {
 			"The fountain splashes water, creating a refreshing mist.",
 		},
 		LeavingMessage: protocol.LEAVING_MESSAGE,
+		Quests: []gameobjects.Quest{
+			{
+				ID:   "fetch_herbs",
+				Name: "Fetch Herbs",
+			},
+			{
+				ID:   "defeat_bandits",
+				Name: "Defeat giant rats",
+			},
+			{
+				ID:   "rescue_princess",
+				Name: "Rescue the Princess",
+			},
+			{
+				ID:   "defend_village",
+				Name: "Defend the Village",
+			},
+			{
+				ID:   "explore_cave",
+				Name: "Explore the Cave",
+			},
+			{
+				ID:   "buy_book",
+				Name: "Buy a rare book",
+			},
+			{
+				ID:   "find_lost_cat",
+				Name: "Find the Lost Cat",
+			},
+		},
 	}
 }

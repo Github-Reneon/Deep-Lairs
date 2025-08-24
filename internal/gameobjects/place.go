@@ -21,8 +21,9 @@ type Place struct {
 	Messages         []string
 	Jingles          []string `json:"jingles"`
 	JoiningLocations map[string]*Place
-	JoiningMessage   string `json:"joining_message"`
-	LeavingMessage   string `json:"leaving_message"`
+	JoiningMessage   string  `json:"joining_message"`
+	LeavingMessage   string  `json:"leaving_message"`
+	Quests           []Quest `json:"quests"`
 }
 
 func (p *Place) AddUserMessage(msg string, user *User) {

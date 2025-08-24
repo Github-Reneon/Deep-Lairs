@@ -92,10 +92,10 @@ func UserQuickLook(splitMsg []string, user *gameobjects.User) {
 	lookUsers(user)
 }
 
-func UserGo(splitMsg []string, user *gameobjects.User) {
+func UserGo(splitMsg []string, user *gameobjects.User) (bool, error) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: go <direction>")
-		return
+		return false, fmt.Errorf("no direction provided")
 	}
 	direction := strings.ToLower(splitMsg[1])
 	switch direction {
@@ -117,13 +117,16 @@ func UserGo(splitMsg []string, user *gameobjects.User) {
 		direction = "out"
 	}
 	if newLocation, ok := user.Location.JoiningLocations[direction]; ok {
+		knownLocation := user.IsKnownLocation(newLocation)
 		user.Location.RemoveUser(user, direction)
 		newLocation.AddUser(user)
 		user.ChangeLocation(newLocation)
 		user.AddMessage(fmt.Sprintf("You go %s.", direction))
 		user.AddKnownLocation(newLocation)
+		return knownLocation, nil
 	} else {
 		user.AddMessage(fmt.Sprintf("You can't go %s.", direction))
+		return false, fmt.Errorf("no location in direction: %s", direction)
 	}
 }
 
@@ -144,6 +147,31 @@ func UserSearch(splitMsg []string, user *gameobjects.User) {
 			if !found {
 				user.AddMessage(fmt.Sprintf("You find an exit going %s.", direction))
 			}
+		}
+	}
+}
+
+func UserJoin(user *gameobjects.User) {
+	UserWhere([]string{"w"}, user)
+	user.AddMessage(fmt.Sprintf(protocol.IMAGE, user.Location.LocationImage))
+	UserQuickLook([]string{"l"}, user)
+}
+
+func UserQuestBoard(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) > 1 {
+		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "questboard "+strings.Join(splitMsg[1:], " ")))
+	} else {
+		if len(user.Location.Quests) == 0 {
+			user.AddMessage("There is no quest board here.")
+		} else {
+			b := strings.Builder{}
+			b.WriteString("You see a quest board with the following quests:<br><span class=\"inline-grid grid-cols-5 gap-4\">")
+			// List available quests
+			for a, quest := range user.Location.Quests {
+				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-gray-900 rounded-lg\">%s (%d)</span>", quest.Name, a+1))
+			}
+			b.WriteString("</span>")
+			user.AddMessage(b.String())
 		}
 	}
 }

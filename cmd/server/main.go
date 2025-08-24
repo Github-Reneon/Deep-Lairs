@@ -53,7 +53,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	user.AddMessage(fmt.Sprintf("User %s connected", user.GetName()))
 	g, ctx := errgroup.WithContext(context.Background())
 
-	user.AddMessage(fmt.Sprintf(protocol.YOU_ARE_IN, user.Location.Name, user.Location.LocationImage))
+	UserJoin(user)
 
 	defer conn.Close()
 
@@ -140,12 +140,22 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 					user.AddMessage("Usage: set_name <name>")
 				}
 			case "go", "g":
-				UserGo(splitMsg, user)
-				UserWhere(splitMsg, user)
+				knownLocation, err := UserGo(splitMsg, user)
+				if err != nil {
+					log.Println("Error in UserGo:", err)
+					break
+				}
+				if !knownLocation {
+					UserJoin(user)
+				} else {
+					UserWhere(splitMsg, user)
+				}
 			case "where", "w":
 				UserWhere(splitMsg, user)
 			case "time", "t":
 				user.AddMessage(fmt.Sprintf("Current server time: %s", time.Now().Format(time.RFC1123)))
+			case "questboard", "qb":
+				UserQuestBoard(splitMsg, user)
 			case "help":
 				user.AddMessage("Available commands: say, look, set_name, help")
 			case "lol", "lmao":
@@ -168,7 +178,7 @@ func main() {
 	world.Places["tavern"] = InitTavernPlace()
 	world.Places["square"] = InitTownSquarePlace()
 	world.Places["square"].JoiningLocations["north"] = world.Places["tavern"]
-	world.Places["tavern"].JoiningLocations["south"] = world.Places["square"]
+	world.Places["tavern"].JoiningLocations["out"] = world.Places["square"]
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	// Set message threads for each place
