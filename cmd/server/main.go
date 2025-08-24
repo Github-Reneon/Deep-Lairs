@@ -48,6 +48,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	user := gameobjects.GetUser(&world, id)
 
+	user.AddKnownLocation(world.Places["tavern"])
+
 	user.AddMessage(fmt.Sprintf("User %s connected", user.GetName()))
 	g, ctx := errgroup.WithContext(context.Background())
 
@@ -139,14 +141,17 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				}
 			case "go", "g":
 				UserGo(splitMsg, user)
+				UserWhere(splitMsg, user)
 			case "where", "w":
-				user.AddMessage(fmt.Sprintf("You are in %s<br>%s", user.Location.Name, user.Location.Description))
+				UserWhere(splitMsg, user)
 			case "time", "t":
 				user.AddMessage(fmt.Sprintf("Current server time: %s", time.Now().Format(time.RFC1123)))
 			case "help":
 				user.AddMessage("Available commands: say, look, set_name, help")
 			case "lol", "lmao":
 				UserLaugh(user)
+			case "se", "search":
+				UserSearch(splitMsg, user)
 			default:
 				user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, firstWord))
 			}
@@ -169,7 +174,7 @@ func main() {
 	// Set message threads for each place
 	for _, place := range world.Places {
 		go place.StartMessageHandler()
-		//go place.StartCheckUsersHandler()
+		go place.StartCheckUsersHandler()
 	}
 	go world.StartJingleHandler()
 

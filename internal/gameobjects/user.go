@@ -1,15 +1,19 @@
 package gameobjects
 
-import "sync"
+import (
+	"slices"
+	"sync"
+)
 
 var userLocks sync.Map
 
 type User struct {
-	ID           string
-	Name         string
-	Location     *Place
-	MessageQueue []string
-	Looked       bool
+	ID             string
+	Name           string
+	Location       *Place
+	MessageQueue   []string
+	Looked         bool
+	KnownLocations []*Place
 }
 
 func (u *User) GetName() string {
@@ -44,4 +48,15 @@ func (u *User) ChangeLocation(newLocation *Place) {
 	defer mu.Unlock()
 	u.Location = newLocation
 	u.Looked = false
+}
+
+func (u *User) AddKnownLocation(location *Place) {
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	if slices.Contains(u.KnownLocations, location) {
+		return
+	}
+	u.KnownLocations = append(u.KnownLocations, location)
 }

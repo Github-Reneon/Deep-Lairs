@@ -4,6 +4,7 @@ import (
 	"deep_lairs/internal/gameobjects"
 	"deep_lairs/internal/protocol"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -120,7 +121,29 @@ func UserGo(splitMsg []string, user *gameobjects.User) {
 		newLocation.AddUser(user)
 		user.ChangeLocation(newLocation)
 		user.AddMessage(fmt.Sprintf("You go %s.", direction))
+		user.AddKnownLocation(newLocation)
 	} else {
 		user.AddMessage(fmt.Sprintf("You can't go %s.", direction))
+	}
+}
+
+func UserWhere(splitMsg []string, user *gameobjects.User) {
+	user.AddMessage(fmt.Sprintf("You are in %s<br>%s", user.Location.Name, user.Location.Description))
+}
+
+func UserSearch(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) > 1 {
+		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "search "+strings.Join(splitMsg[1:], " ")))
+	} else {
+		for direction, place := range user.Location.JoiningLocations {
+			found := false
+			if slices.Contains(user.KnownLocations, place) {
+				user.AddMessage(fmt.Sprintf("%s is %s", place.Name, direction))
+				found = true
+			}
+			if !found {
+				user.AddMessage(fmt.Sprintf("You find an exit going %s.", direction))
+			}
+		}
 	}
 }
