@@ -67,9 +67,15 @@ func lookUsers(user *gameobjects.User) {
 	if len(users) >= 1 {
 		if len(users) >= 10 {
 			user.AddMessage(fmt.Sprintf("You see many adventurers here. %d in total.", len(users)))
-		}
-		for _, u := range users {
-			user.AddMessage(fmt.Sprintf("You see %s here.", u))
+		} else {
+			b := strings.Builder{}
+			b.WriteString("You see the following adventurers here:<br class=\"my-2\">")
+			b.WriteString("<span class=\"inline-grid grid-cols-5 gap-4\">")
+			for _, u := range users {
+				b.WriteString(fmt.Sprintf("<span class=\"p-2\">%s</span>", u))
+			}
+			b.WriteString("</span>")
+			user.AddMessage(b.String())
 		}
 	} else {
 		user.AddMessage("You don't see any other adventurers here.")
@@ -83,4 +89,38 @@ func UserQuickLook(splitMsg []string, user *gameobjects.User) {
 		user.AddMessage(fmt.Sprintf(protocol.LOOK_NO_IMAGE, user.Location.TitleLook, user.Location.Look))
 	}
 	lookUsers(user)
+}
+
+func UserGo(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) < 2 {
+		user.AddMessage("Usage: go <direction>")
+		return
+	}
+	direction := strings.ToLower(splitMsg[1])
+	switch direction {
+	case "n":
+		direction = "north"
+	case "s":
+		direction = "south"
+	case "e":
+		direction = "east"
+	case "w":
+		direction = "west"
+	case "d":
+		direction = "down"
+	case "u":
+		direction = "up"
+	case "i":
+		direction = "in"
+	case "o":
+		direction = "out"
+	}
+	if newLocation, ok := user.Location.JoiningLocations[direction]; ok {
+		user.Location.RemoveUser(user, direction)
+		newLocation.AddUser(user)
+		user.ChangeLocation(newLocation)
+		user.AddMessage(fmt.Sprintf("You go %s.", direction))
+	} else {
+		user.AddMessage(fmt.Sprintf("You can't go %s.", direction))
+	}
 }

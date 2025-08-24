@@ -22,6 +22,19 @@ type Place struct {
 	Jingles          []string `json:"jingles"`
 	JoiningLocations map[string]*Place
 	JoiningMessage   string `json:"joining_message"`
+	LeavingMessage   string `json:"leaving_message"`
+}
+
+func (p *Place) AddUserMessage(msg string, user *User) {
+	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	for _, u := range p.Users {
+		if u != user {
+			u.AddMessage(msg)
+		}
+	}
 }
 
 func (p *Place) AddMessage(msg string) {
@@ -54,7 +67,8 @@ func (p *Place) RemoveMessage(msg string) {
 	p.Messages = p.Messages[1:]
 }
 
-func (p *Place) RemoveUser(user *User) {
+func (p *Place) RemoveUser(user *User, direction string) {
+	defer p.AddUserMessage(fmt.Sprintf(p.LeavingMessage, user.GetName(), direction), user)
 	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
@@ -64,7 +78,7 @@ func (p *Place) RemoveUser(user *User) {
 }
 
 func (p *Place) AddUser(user *User) {
-	defer p.AddMessage(fmt.Sprintf(p.JoiningMessage, user.GetName()))
+	defer p.AddUserMessage(fmt.Sprintf(p.JoiningMessage, user.GetName()), user)
 	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
@@ -96,7 +110,7 @@ func (p *Place) StartCheckUsersHandler() {
 			for _, user := range p.Users {
 				if user.Location != p {
 					log.Println("Removing user from place:", user.Name)
-					p.RemoveUser(user)
+					p.RemoveUser(user, "poof")
 					p.AddMessage(fmt.Sprintf("User %s has been removed from %s.", user.Name, p.Name))
 				}
 			}

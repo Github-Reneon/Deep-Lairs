@@ -29,8 +29,16 @@ type Message struct {
 
 // joining messages
 var (
-	JOINING_MESSAGE   = "%s has joined the %s."
-	STUMBLES_IN       = "%s stumbles in."
-	CREEPS_IN         = "%s creeps in."
-	ENTERS_CAUTIOUSLY = "%s enters cautiously."
+	JOINING_MESSAGE           = "%s has arrived."
+	JOINING_STUMBLES_IN       = "%s stumbles in."
+	JOINING_CREEPS_IN         = "%s creeps in."
+	JOINING_ENTERS_CAUTIOUSLY = "%s arrives cautiously."
+)
+
+// Leaving messages
+var (
+	LEAVING_MESSAGE           = "%s has left, going %s."
+	LEAVING_STUMBLES_OUT      = "%s stumbles out, going %s."
+	LEAVING_CREEPS_OUT        = "%s creeps out, going %s."
+	LEAVING_ENTERS_CAUTIOUSLY = "%s leaves cautiously, going %s."
 )

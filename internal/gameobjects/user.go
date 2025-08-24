@@ -36,3 +36,12 @@ func (u *User) ClearLastMessage() {
 		u.MessageQueue = u.MessageQueue[1:]
 	}
 }
+
+func (u *User) ChangeLocation(newLocation *Place) {
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	u.Location = newLocation
+	u.Looked = false
+}

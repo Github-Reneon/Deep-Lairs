@@ -5,7 +5,7 @@ import (
 	"deep_lairs/internal/protocol"
 )
 
-func InitPlace() *gameobjects.Place {
+func InitTavernPlace() *gameobjects.Place {
 	return &gameobjects.Place{
 		ID:          "tavern",
 		Name:        "The Lofty Tavern",
@@ -18,7 +18,7 @@ func InitPlace() *gameobjects.Place {
 		Users:            make(map[string]*gameobjects.User),
 		Messages:         make([]string, 0),
 		JoiningLocations: make(map[string]*gameobjects.Place),
-		JoiningMessage:   protocol.STUMBLES_IN,
+		JoiningMessage:   protocol.JOINING_STUMBLES_IN,
 		Jingles: []string{
 			"Someone falls over.",
 			"A bard starts playing a lively tune.",
@@ -33,5 +33,30 @@ func InitPlace() *gameobjects.Place {
 			"A cat jumps onto a table, knocking over drinks.",
 			"You feel as if it's all going to be all right.",
 		},
+		LeavingMessage: protocol.LEAVING_STUMBLES_OUT,
+	}
+}
+
+func InitTownSquarePlace() *gameobjects.Place {
+	return &gameobjects.Place{
+		ID:               "square",
+		Name:             "The Town Square",
+		Description:      "The bustling heart of the town, filled with merchants and townsfolk.",
+		TitleLook:        "You see a vibrant square filled with people.",
+		Look:             "Stalls line the streets, selling all manner of goods. A fountain bubbles in the center.",
+		LocationImage:    "square.webp",
+		LookImage:        "fountain.webp",
+		Users:            make(map[string]*gameobjects.User),
+		Messages:         make([]string, 0),
+		JoiningLocations: make(map[string]*gameobjects.Place),
+		JoiningMessage:   protocol.JOINING_MESSAGE,
+		Jingles: []string{
+			"Someone drops their coins, and a child quickly picks them up.",
+			"A bard begins to play a lively tune, drawing a crowd.",
+			"A merchant shouts about their wares, trying to attract customers.",
+			"A group of adventurers discusses their latest quest.",
+			"The fountain splashes water, creating a refreshing mist.",
+		},
+		LeavingMessage: protocol.LEAVING_MESSAGE,
 	}
 }

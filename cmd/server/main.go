@@ -82,7 +82,7 @@ func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 					log.Println("Error writing message:", err)
 					user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
-					user.Location.RemoveUser(user)
+					user.Location.RemoveUser(user, "poof")
 					return err
 				} else {
 					user.ClearLastMessage()
@@ -104,7 +104,7 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 			if err != nil {
 				log.Println("Error reading message:", err)
 				user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
-				user.Location.RemoveUser(user)
+				user.Location.RemoveUser(user, "poof")
 				return err
 			}
 			// basic parse message replace soon
@@ -137,6 +137,8 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					user.AddMessage("Usage: set_name <name>")
 				}
+			case "go", "g":
+				UserGo(splitMsg, user)
 			case "where", "w":
 				user.AddMessage(fmt.Sprintf("You are in %s<br>%s", user.Location.Name, user.Location.Description))
 			case "time", "t":
@@ -158,7 +160,10 @@ func main() {
 
 	// Initialize world with default places
 	// Replace this later
-	world.Places["tavern"] = InitPlace()
+	world.Places["tavern"] = InitTavernPlace()
+	world.Places["square"] = InitTownSquarePlace()
+	world.Places["square"].JoiningLocations["north"] = world.Places["tavern"]
+	world.Places["tavern"].JoiningLocations["south"] = world.Places["square"]
 	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	// Set message threads for each place
