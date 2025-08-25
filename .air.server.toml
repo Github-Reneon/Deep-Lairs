@@ -4,4 +4,4 @@ tmp_dir = "tmp"
 [build]
 bin = "tmp/server"
 cmd = "go build -o ./tmp/server ./cmd/server"
-include_ext = ["go", "json"]
+include_ext = ["go"]
