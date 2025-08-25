@@ -63,6 +63,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	UserJoin(user)
 
 	go user.StartCalcStatsHandler()
+	go user.StartSetIdsHandler()
 	SendUserState(user)
 
 	defer conn.Close()

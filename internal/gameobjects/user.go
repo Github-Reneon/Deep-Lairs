@@ -188,35 +188,32 @@ func (u *User) UnequipItem(item *Item) {
 }
 
 func (u *User) StartCalcStatsHandler() {
-	// Start a goroutine to calculate stats
-	go func() {
-		for {
-			// Simulate stat calculation
-			time.Sleep(time.Second)
-			if u.changed {
-				u.changed = false
-				u.MaxHealth = u.BaseMaxHealth
-				u.Mana = u.BaseMaxMana
-				u.Stamina = u.BaseMaxStamina
-				u.Attack = u.BaseAttack
-				u.Defense = u.BaseDefense
-				for _, equippedItem := range u.Equipped {
-					switch equippedItem.BonusType {
-					case BONUS_TYPE_ATTACK:
-						u.Attack = u.BaseAttack + equippedItem.BonusAmount
-					case BONUS_TYPE_DEFENSE:
-						u.Defense = u.BaseDefense + equippedItem.BonusAmount
-					case BONUS_TYPE_MANA:
-						u.MaxMana = u.BaseMaxMana + equippedItem.BonusAmount
-					case BONUS_TYPE_HEALTH:
-						u.MaxHealth = u.BaseMaxHealth + equippedItem.BonusAmount
-					}
+	for {
+		// Simulate stat calculation
+		time.Sleep(time.Second)
+		if u.changed {
+			u.changed = false
+			u.MaxHealth = u.BaseMaxHealth
+			u.Mana = u.BaseMaxMana
+			u.Stamina = u.BaseMaxStamina
+			u.Attack = u.BaseAttack
+			u.Defense = u.BaseDefense
+			for _, equippedItem := range u.Equipped {
+				switch equippedItem.BonusType {
+				case BONUS_TYPE_ATTACK:
+					u.Attack = u.BaseAttack + equippedItem.BonusAmount
+				case BONUS_TYPE_DEFENSE:
+					u.Defense = u.BaseDefense + equippedItem.BonusAmount
+				case BONUS_TYPE_MANA:
+					u.MaxMana = u.BaseMaxMana + equippedItem.BonusAmount
+				case BONUS_TYPE_HEALTH:
+					u.MaxHealth = u.BaseMaxHealth + equippedItem.BonusAmount
 				}
-				// send back the state
-				u.AddMessage(u.GetState())
 			}
+			// send back the state to the client
+			u.AddMessage(u.GetState())
 		}
-	}()
+	}
 }
 
 func (u *User) Init() {
@@ -232,6 +229,7 @@ func (u *User) Init() {
 	u.Level = 1
 }
 
+// SetIds assigns unique IDs to the user and their items.
 func (u *User) SetIds() {
 	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
@@ -250,14 +248,22 @@ func (u *User) SetIds() {
 	}
 }
 
+func (u *User) StartSetIdsHandler() {
+	// Start a goroutine to set IDs
+	for {
+		time.Sleep(time.Second)
+		u.SetIds()
+	}
+}
+
 func (u *User) Save() {
 	// lock
-	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	muInterface, _ := userLocks.LoadOrStore(u.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
 	// save user state to json file in ./json/users/
-	filePath := fmt.Sprintf("./json/users/%s.json", u.ID)
+	filePath := fmt.Sprintf("./json/users/%s.json", u.Name)
 	data, err := json.Marshal(u)
 	if err != nil {
 		log.Println("Error marshalling user data:", err)

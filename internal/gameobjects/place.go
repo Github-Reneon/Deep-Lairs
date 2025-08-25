@@ -109,10 +109,8 @@ func (p *Place) StartCheckUsersHandler() {
 	for {
 		time.Sleep(time.Second * 5)
 		if len(p.Users) > 0 {
-			log.Println("Checking users in place:", p.Name)
 			for _, user := range p.Users {
 				if user.Location != p {
-					log.Println("Removing user from place:", user.Name)
 					p.RemoveUser(user, "poof")
 					p.AddMessage(fmt.Sprintf("User %s has been removed from %s.", user.Name, p.Name))
 				}
