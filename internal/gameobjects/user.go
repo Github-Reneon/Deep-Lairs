@@ -107,7 +107,7 @@ func (u *User) GetState() string {
 		Health:  fmt.Sprintf("HP: %d/%d", u.Health, u.MaxHealth),
 		MP:      fmt.Sprintf("MP: %d/%d", u.Mana, u.MaxMana),
 		Stamina: fmt.Sprintf("ST: %d/%d", u.Stamina, u.MaxStamina),
-		XP:      fmt.Sprintf("XP: %d/%d", u.XP, u.maxXP),
+		XP:      fmt.Sprintf("XP: %d/%d", u.XP, u.MaxXP),
 		Combat:  u.InCombat,
 	}
 	jsonData, _ := json.Marshal(ret)
@@ -141,7 +141,7 @@ func (u *User) Search() {
 				found = true
 			}
 			if !found {
-				u.AddMessage(fmt.Sprintf("You find an exit going %s.", direction))
+				u.AddMessage(fmt.Sprintf(place.HiddenLocationMessage, direction))
 			}
 		}
 	} else {
@@ -185,21 +185,21 @@ func (u *User) StartCalcStatsHandler() {
 			time.Sleep(time.Second)
 			if u.changed {
 				u.changed = false
-				u.MaxHealth = u.baseMaxHealth
-				u.Mana = u.baseMaxMana
-				u.Stamina = u.baseMaxStamina
-				u.Attack = u.baseAttack
-				u.Defense = u.baseDefense
+				u.MaxHealth = u.BaseMaxHealth
+				u.Mana = u.BaseMaxMana
+				u.Stamina = u.BaseMaxStamina
+				u.Attack = u.BaseAttack
+				u.Defense = u.BaseDefense
 				for _, equippedItem := range u.Equipped {
 					switch equippedItem.BonusType {
 					case BONUS_TYPE_ATTACK:
-						u.Attack = u.baseAttack + equippedItem.BonusAmount
+						u.Attack = u.BaseAttack + equippedItem.BonusAmount
 					case BONUS_TYPE_DEFENSE:
-						u.Defense = u.baseDefense + equippedItem.BonusAmount
+						u.Defense = u.BaseDefense + equippedItem.BonusAmount
 					case BONUS_TYPE_MANA:
-						u.MaxMana = u.baseMaxMana + equippedItem.BonusAmount
+						u.MaxMana = u.BaseMaxMana + equippedItem.BonusAmount
 					case BONUS_TYPE_HEALTH:
-						u.MaxHealth = u.baseMaxHealth + equippedItem.BonusAmount
+						u.MaxHealth = u.BaseMaxHealth + equippedItem.BonusAmount
 					}
 				}
 				// send back the state
