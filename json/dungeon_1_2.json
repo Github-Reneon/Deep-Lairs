@@ -1,0 +1,20 @@
+{
+    "id": "dungeon_1_2",
+    "name": "The Dungeon Continues",
+    "description": "The beginnings of something dangerous. Dare you venture forth?",
+    "look": "The walls are covered in moss and the air is thick with humidity. It's damp here, and the dungeon is filled with the sounds of dripping water. A faint light flickers in the distance going <span class=\"underline font-bold\">up</span> the ladder out of the well.",
+    "title_look": "At the bottom of the well, you see the beginnings of a dark dungeon.",
+    "look_image": "dungeon.webp",
+    "location_image": "dungeon.webp",
+    "jingles": [
+        "You hear distant dripping water echoing through the corridors.",
+        "The faint sound of chains rattling can be heard in the distance."
+    ],
+    "joining_location_ids": {
+        "south": "dungeon_1_1"
+    },
+    "joining_message": "%s creeps in silently.",
+    "leaving_message": "%s leaves the darkness, going %s.",
+    "quests": [],
+    "hidden_location_message": "You notice a hidden passageway going <span class=\"underline font-bold\">down</span> a well."
+}

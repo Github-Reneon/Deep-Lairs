@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -214,16 +217,32 @@ func main() {
 	http.HandleFunc("/ws", handleConnections)
 	fmt.Println("Server started on", protocol.PORT)
 
-	// Initialize world with default places
-	// Replace this later
-	world.Places["tavern"] = InitTavernPlace()
-	world.Places["square"] = InitTownSquarePlace()
-	world.Places["square"].JoiningLocations["north"] = world.Places["tavern"]
-	world.Places["tavern"].JoiningLocations["out"] = world.Places["square"]
-	// ^^^^^^^^^^^^^^^^^^^^^^^^^^
+	// for each json file in ./json folder consume and deserialise to a place
+	files, err := os.ReadDir("./json")
+	if err != nil {
+		log.Println("Error reading json directory:", err)
+		return
+	}
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".json" {
+			data, err := os.ReadFile("./json/" + file.Name())
+			if err != nil {
+				log.Println("Error reading json file:", err)
+				continue
+			}
+			var place gameobjects.Place
+			if err := json.Unmarshal(data, &place); err != nil {
+				log.Println("Error unmarshalling json:", err)
+				continue
+			}
+			log.Println(place.ID, place.Name, place.JoiningLocationIds)
+			world.Places[place.ID] = &place
+		}
+	}
 
 	// Set message threads for each place
 	for _, place := range world.Places {
+		place.Init(&world)
 		go place.StartMessageHandler()
 		go place.StartCheckUsersHandler()
 	}

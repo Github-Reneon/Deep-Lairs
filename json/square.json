@@ -1,0 +1,56 @@
+{
+    "id": "square",
+    "name": "The Town Square",
+    "description": "The bustling heart of the town, filled with merchants and townsfolk.",
+    "look": "Stalls line the streets, selling all manner of goods. A fountain bubbles in the center. Children are playing nearby. To the \u003cspan class=\"font-bold underline\"\u003enorth\u003c/span\u003e, you see the entrance to a Tavern.",
+    "title_look": "You see a vibrant square filled with people.",
+    "look_image": "town.webp",
+    "location_image": "town.webp",
+    "jingles": [
+        "Someone drops their coins, and a child quickly picks them up.",
+        "A bard begins to play a lively tune, drawing a crowd.",
+        "A merchant shouts about their wares, trying to attract customers.",
+        "A group of adventurers discusses their latest quest.",
+        "The fountain splashes water, creating a refreshing mist."
+    ],
+    "joining_location_ids": {
+        "north": "tavern",
+        "down": "dungeon_1_1"
+    },
+    "joining_message": "%s has arrived.",
+    "leaving_message": "%s has left, going %s.",
+    "quests": [
+        {
+            "id": "fake quests",
+            "name": "These are all fake quests"
+        },
+        {
+            "id": "fetch_herbs",
+            "name": "Fetch Herbs"
+        },
+        {
+            "id": "defeat_bandits",
+            "name": "Defeat giant rats"
+        },
+        {
+            "id": "rescue_princess",
+            "name": "Rescue the Princess"
+        },
+        {
+            "id": "defend_village",
+            "name": "Defend the Village"
+        },
+        {
+            "id": "explore_cave",
+            "name": "Explore the Cave"
+        },
+        {
+            "id": "buy_book",
+            "name": "Buy a rare book"
+        },
+        {
+            "id": "find_lost_cat",
+            "name": "Find the Lost Cat"
+        }
+    ]
+}

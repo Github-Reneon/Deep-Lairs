@@ -6,7 +6,7 @@ import (
 )
 
 func InitTavernPlace() *gameobjects.Place {
-	return &gameobjects.Place{
+	ret := gameobjects.Place{
 		ID:          "tavern",
 		Name:        "The Lofty Tavern",
 		Description: "A cozy tavern with warm lighting.",
@@ -35,6 +35,7 @@ func InitTavernPlace() *gameobjects.Place {
 		},
 		LeavingMessage: protocol.LEAVING_STUMBLES_OUT,
 	}
+	return &ret
 }
 
 func InitTownSquarePlace() *gameobjects.Place {

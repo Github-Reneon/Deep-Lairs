@@ -10,20 +10,22 @@ import (
 var placeLocks sync.Map
 
 type Place struct {
-	ID               string `json:"id"`
-	Name             string `json:"name"`
-	Description      string `json:"description"`
-	Users            map[string]*User
-	Look             string `json:"look"`
-	TitleLook        string `json:"title_look"`
-	LookImage        string `json:"look_image"`
-	LocationImage    string `json:"location_image"`
-	Messages         []string
-	Jingles          []string `json:"jingles"`
-	JoiningLocations map[string]*Place
-	JoiningMessage   string  `json:"joining_message"`
-	LeavingMessage   string  `json:"leaving_message"`
-	Quests           []Quest `json:"quests"`
+	ID                    string            `json:"id"`
+	Name                  string            `json:"name"`
+	Description           string            `json:"description"`
+	Users                 map[string]*User  `json:"-"`
+	Look                  string            `json:"look"`
+	TitleLook             string            `json:"title_look"`
+	LookImage             string            `json:"look_image"`
+	LocationImage         string            `json:"location_image"`
+	Messages              []string          `json:"-"`
+	Jingles               []string          `json:"jingles"`
+	JoiningLocations      map[string]*Place `json:"-"`
+	JoiningLocationIds    map[string]string `json:"joining_location_ids"`
+	JoiningMessage        string            `json:"joining_message"`
+	LeavingMessage        string            `json:"leaving_message"`
+	Quests                []Quest           `json:"quests,omitempty"`
+	HiddenLocationMessage string            `json:"hidden_location_message,omitempty"`
 }
 
 func (p *Place) AddUserMessage(msg string, user *User) {
@@ -116,5 +118,15 @@ func (p *Place) StartCheckUsersHandler() {
 				}
 			}
 		}
+	}
+}
+
+func (p *Place) Init(world *World) {
+	p.JoiningLocations = make(map[string]*Place)
+	p.Users = make(map[string]*User)
+	for dir, loc := range p.JoiningLocationIds {
+		log.Println("Initializing joining location:", dir, loc)
+		log.Println(world.Places[loc].ID, world.Places[loc].Name)
+		p.JoiningLocations[dir] = world.Places[loc]
 	}
 }
