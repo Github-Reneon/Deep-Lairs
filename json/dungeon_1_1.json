@@ -17,5 +17,5 @@
     "joining_message": "%s creeps in silently.",
     "leaving_message": "%s leaves the darkness, going %s.",
     "quests": [],
-    "hidden_location_message": "You notice a hidden passageway going <span class=\"underline font-bold\">down</span> a well."
+    "hidden_location_message": "You notice a hidden passageway going <span class=\"underline font-bold\">%s</span> a well."
 }
