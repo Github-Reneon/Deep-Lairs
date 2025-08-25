@@ -53,7 +53,16 @@ func UserLook(splitMsg []string, user *gameobjects.User) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "look "+strings.Join(splitMsg[1:], " ")))
 	} else {
-		user.AddMessage(fmt.Sprintf(protocol.LOOK, user.Location.TitleLook, user.Location.Look, user.Location.LookImage))
+		b := strings.Builder{}
+		b.WriteString(fmt.Sprintf(protocol.LOOK, user.Location.TitleLook, user.Location.Look, user.Location.LookImage))
+		if len(user.Location.JoiningLocations) > 0 {
+			for direction, place := range user.Location.JoiningLocations {
+				if slices.Contains(user.KnownLocations, place) && place.HiddenLocationMessage != "" {
+					b.WriteString(fmt.Sprintf(place.HiddenLocationMessage, direction))
+				}
+			}
+		}
+		user.AddMessage(b.String())
 		lookUsers(user)
 	}
 }
@@ -87,7 +96,17 @@ func UserQuickLook(splitMsg []string, user *gameobjects.User) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "quick_look "+strings.Join(splitMsg[1:], " ")))
 	} else {
-		user.AddMessage(fmt.Sprintf(protocol.LOOK_NO_IMAGE, user.Location.TitleLook, user.Location.Look))
+		b := strings.Builder{}
+		b.WriteString(fmt.Sprintf(protocol.LOOK_NO_IMAGE, user.Location.TitleLook, user.Location.Look))
+		b.WriteString(" ")
+		if len(user.Location.JoiningLocations) > 0 {
+			for direction, place := range user.Location.JoiningLocations {
+				if slices.Contains(user.KnownLocations, place) && place.HiddenLocationMessage != "" {
+					b.WriteString(fmt.Sprintf(place.HiddenLocationMessage, direction))
+				}
+			}
+		}
+		user.AddMessage(b.String())
 	}
 	lookUsers(user)
 }
