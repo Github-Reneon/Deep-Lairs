@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"slices"
 	"sync"
 	"time"
@@ -14,14 +15,23 @@ import (
 var userLocks sync.Map
 
 type User struct {
-	ID             string
-	Name           string
-	Location       *Place
-	MessageQueue   []string
-	Looked         bool
-	KnownLocations []*Place
-	Busy           bool
-	changed        bool
+	ID               string   `json:"id"`
+	Name             string   `json:"name"`
+	Location         *Place   `json:"-"`
+	LocationId       string   `json:"location"`
+	MessageQueue     []string `json:"-"`
+	Looked           bool     `json:"-"`
+	KnownLocations   []*Place `json:"-"`
+	KnownLocationIds []string `json:"known_locations"`
+	Busy             bool     `json:"-"`
+	changed          bool     `json:"-"`
+	UserFightable
+}
+
+type UserFightable struct {
+	XP    int `json:"xp"`
+	MaxXP int `json:"max_xp"`
+	Level int `json:"level"`
 	Fightable
 }
 
@@ -207,4 +217,53 @@ func (u *User) StartCalcStatsHandler() {
 			}
 		}
 	}()
+}
+
+func (u *User) Init() {
+	// lock
+	defer u.SetIds()
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	u.UserFightable.InitFightable(100, 10, 5, 20, 15, 12, 8)
+	u.XP = 0
+	u.MaxXP = 100
+	u.Level = 1
+}
+
+func (u *User) SetIds() {
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	u.KnownLocationIds = make([]string, len(u.KnownLocations))
+	for i, location := range u.KnownLocations {
+		u.KnownLocationIds[i] = location.ID
+	}
+	u.ItemStates = make([]ItemState, len(u.Items))
+	for i, item := range u.Items {
+		u.ItemStates[i] = ItemState{
+			ItemId:   item.Id,
+			Equipped: slices.Contains(u.Equipped, item),
+		}
+	}
+}
+
+func (u *User) Save() {
+	// lock
+	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	// save user state to json file in ./json/users/
+	filePath := fmt.Sprintf("./json/users/%s.json", u.ID)
+	data, err := json.Marshal(u)
+	if err != nil {
+		log.Println("Error marshalling user data:", err)
+		return
+	}
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		log.Println("Error writing user data to file:", err)
+	}
 }

@@ -1,28 +1,32 @@
 package gameobjects
 
 type Fightable struct {
-	Health         int     `json:"health"`
-	MaxHealth      int     `json:"max_health"`
-	BaseMaxHealth  int     `json:"-"`
-	Attack         int     `json:"attack"`
-	BaseAttack     int     `json:"-"`
-	Defense        int     `json:"defense"`
-	BaseDefense    int     `json:"-"`
-	Mana           int     `json:"mana"`
-	MaxMana        int     `json:"max_mana"`
-	BaseMaxMana    int     `json:"-"`
-	Stamina        int     `json:"stamina"`
-	MaxStamina     int     `json:"max_stamina"`
-	BaseMaxStamina int     `json:"-"`
-	XP             int     `json:"xp"`
-	MaxXP          int     `json:"max_xp"`
-	Speed          int     `json:"speed"`
-	BaseSpeed      int     `json:"-"`
-	Int            int     `json:"int"`
-	BaseInt        int     `json:"-"`
-	InCombat       bool    `json:"in_combat"`
-	Items          []*Item `json:"items"`
-	Equipped       []*Item `json:"equipped"`
+	Health         int         `json:"-"`
+	MaxHealth      int         `json:"health"`
+	BaseMaxHealth  int         `json:"-"`
+	Attack         int         `json:"-"`
+	BaseAttack     int         `json:"attack"`
+	Defense        int         `json:"-"`
+	BaseDefense    int         `json:"defense"`
+	Mana           int         `json:"-"`
+	MaxMana        int         `json:"mana"`
+	BaseMaxMana    int         `json:"-"`
+	Stamina        int         `json:"-"`
+	MaxStamina     int         `json:"stamina"`
+	BaseMaxStamina int         `json:"-"`
+	Speed          int         `json:"-"`
+	BaseSpeed      int         `json:"speed"`
+	Int            int         `json:"-"`
+	BaseInt        int         `json:"intelligence"`
+	InCombat       bool        `json:"-"`
+	Items          []*Item     `json:"-"`
+	ItemStates     []ItemState `json:"items"`
+	Equipped       []*Item     `json:"-"`
+}
+
+type ItemState struct {
+	ItemId   string `json:"item_id"`
+	Equipped bool   `json:"equipped"`
 }
 
 func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed, intelligence int) {
@@ -39,8 +43,6 @@ func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed,
 	f.Stamina = stamina
 	f.MaxStamina = stamina
 	f.BaseMaxStamina = stamina
-	f.XP = 0
-	f.MaxXP = 100
 	f.InCombat = false
 	f.Speed = speed
 	f.BaseSpeed = speed

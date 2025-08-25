@@ -51,18 +51,11 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	})
 
 	user := gameobjects.GetUser(&world, id)
-	// health int, attack int, defense int, mana int, stamina int
-	user.InitFightable(
-		7, // health
-		5, // attack
-		5, // defense
-		1, // mana
-		1, // stamina
-		3, // speed
-		1, // intelligence
-	)
 
 	user.AddKnownLocation(world.Places["tavern"])
+	user.Init()
+
+	user.Save()
 
 	user.AddMessage(fmt.Sprintf("User %s connected", user.GetName()))
 	g, ctx := errgroup.WithContext(context.Background())
@@ -213,19 +206,41 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 	}
 }
 
+// entry point for the application
+// ad astra!!
 func main() {
 	http.HandleFunc("/ws", handleConnections)
 	fmt.Println("Server started on", protocol.PORT)
 
+	loadWorld()
+
+	// Initialise the worlds and set message threads for each place
+	for _, place := range world.Places {
+		// init currently sets the paths between places
+		// but it will also initially create the enemies in the world
+		// and NPCs
+		place.Init(&world)
+		go place.StartMessageHandler()
+		go place.StartCheckUsersHandler()
+	}
+	go world.StartJingleHandler()
+
+	if err := http.ListenAndServe(protocol.PORT, nil); err != nil {
+		fmt.Println("Error starting server:", err)
+	}
+}
+
+// loadWorld initializes the game world by loading place data from JSON files.
+func loadWorld() {
 	// for each json file in ./json folder consume and deserialise to a place
-	files, err := os.ReadDir("./json")
+	files, err := os.ReadDir("./json/places/")
 	if err != nil {
 		log.Println("Error reading json directory:", err)
-		return
+		panic(err)
 	}
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".json" {
-			data, err := os.ReadFile("./json/" + file.Name())
+			data, err := os.ReadFile("./json/places/" + file.Name())
 			if err != nil {
 				log.Println("Error reading json file:", err)
 				continue
@@ -238,17 +253,5 @@ func main() {
 			log.Println(place.ID, place.Name, place.JoiningLocationIds)
 			world.Places[place.ID] = &place
 		}
-	}
-
-	// Set message threads for each place
-	for _, place := range world.Places {
-		place.Init(&world)
-		go place.StartMessageHandler()
-		go place.StartCheckUsersHandler()
-	}
-	go world.StartJingleHandler()
-
-	if err := http.ListenAndServe(protocol.PORT, nil); err != nil {
-		fmt.Println("Error starting server:", err)
 	}
 }
