@@ -247,7 +247,7 @@ func main() {
 	}
 	go world.StartJingleHandler()
 
-	if err := http.ListenAndServe(protocol.CLIENT_PORT, nil); err != nil {
+	if err := http.ListenAndServe(protocol.SERVER_PORT, nil); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 }
