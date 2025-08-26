@@ -46,7 +46,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	world.Places["tavern"].AddUser(&gameobjects.User{
 		ID:       id,
-		Name:     "Reneon",
+		Name:     "Adventurer",
 		Location: world.Places["tavern"],
 	})
 

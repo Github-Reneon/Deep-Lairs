@@ -1,6 +1,7 @@
 package main
 
 import (
+	"deep_lairs/internal/protocol"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,9 +24,20 @@ func main() {
 		Download: false,
 	})
 
+	// cors allow all origins
+	app.Use(func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", "*")
+		c.Set("Access-Control-Allow-Methods", "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS")
+		c.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Method() == "OPTIONS" {
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+		return c.Next()
+	})
+
 	app.Get("/", GetIndex)
 
-	if err := app.Listen(":8080"); err != nil {
+	if err := app.Listen(protocol.PORT); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 }
