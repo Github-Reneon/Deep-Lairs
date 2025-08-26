@@ -53,7 +53,16 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	user := gameobjects.GetUser(&world, id)
 
 	user.AddKnownLocation(world.Places["tavern"])
-	user.Init()
+	// comment stats
+	user.Init(
+		100, // health
+		10,  // attack
+		5,   // defense
+		20,  // mana
+		15,  // stamina
+		1,   // speed
+		1,   // intelligence
+	)
 
 	user.Save()
 

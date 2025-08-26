@@ -151,7 +151,11 @@ func (u *User) Search() {
 				found = true
 			}
 			if !found {
-				u.AddMessage(fmt.Sprintf(place.HiddenLocationMessage, direction))
+				if place.HiddenLocationMessage != "" {
+					u.AddMessage(fmt.Sprintf(place.HiddenLocationMessage, direction))
+				} else {
+					u.AddMessage(fmt.Sprintf("%s is %s", place.Name, direction))
+				}
 			}
 		}
 	} else {
@@ -216,14 +220,14 @@ func (u *User) StartCalcStatsHandler() {
 	}
 }
 
-func (u *User) Init() {
+func (u *User) Init(health, attack, defense, mana, stamina, speed, intelligence int) {
 	// lock
 	defer u.SetIds()
 	muInterface, _ := userLocks.LoadOrStore(u.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	u.UserFightable.InitFightable(100, 10, 5, 20, 15, 12, 8)
+	u.UserFightable.InitFightable(health, attack, defense, mana, stamina, speed, intelligence)
 	u.XP = 0
 	u.MaxXP = 100
 	u.Level = 1
