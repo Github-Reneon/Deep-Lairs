@@ -6,7 +6,8 @@ const (
 )
 
 const (
-	PORT = ":3000"
+	SERVER_PORT = ":3000"
+	CLIENT_PORT = ":4000"
 )
 
 // format types for sprintf

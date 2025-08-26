@@ -5,4 +5,4 @@ tmp_dir = "tmp"
 bin = "tmp/client"
 cmd = "go build -o ./tmp/client ./cmd/client"
 include_dir = ["views", "static"]
-include_ext = ["go", "html", "css"]
+include_ext = ["go"]

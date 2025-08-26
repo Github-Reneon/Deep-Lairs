@@ -12,6 +12,8 @@ func main() {
 
 	engine := html.New("./views", ".html")
 
+	engine.Reload(true)
+
 	app := fiber.New(
 		fiber.Config{
 			Views: engine,
@@ -37,7 +39,7 @@ func main() {
 
 	app.Get("/", GetIndex)
 
-	if err := app.Listen(protocol.PORT); err != nil {
+	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 }

@@ -220,7 +220,7 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 // ad astra!!
 func main() {
 	http.HandleFunc("/ws", handleConnections)
-	fmt.Println("Server started on", protocol.PORT)
+	fmt.Println("Server started on", protocol.SERVER_PORT)
 
 	loadWorld()
 
@@ -235,7 +235,7 @@ func main() {
 	}
 	go world.StartJingleHandler()
 
-	if err := http.ListenAndServe(protocol.PORT, nil); err != nil {
+	if err := http.ListenAndServe(protocol.CLIENT_PORT, nil); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 }
