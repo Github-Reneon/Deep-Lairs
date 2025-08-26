@@ -2,7 +2,7 @@
     "id": "square",
     "name": "The Town Square",
     "description": "The bustling heart of the town, filled with merchants and townsfolk.",
-    "look": "Stalls line the streets, selling all manner of goods. A fountain bubbles in the center. Children are playing nearby. To the \u003cspan class=\"font-bold underline\"\u003enorth\u003c/span\u003e, you see the entrance to a Tavern.",
+    "look": "Stalls line the streets, selling all manner of goods. A fountain bubbles in the center. Children are playing nearby. To the \u003cspan class=\"font-bold underline\"\u003enorth\u003c/span\u003e, you see the entrance to a Tavern, and to the \u003cspan class=\"font-bold underline\"\u003ewest\u003c/span\u003e, the grand Hall of Heroes.",
     "title_look": "You see a vibrant square filled with people.",
     "look_image": "town.webp",
     "location_image": "town.webp",
@@ -15,6 +15,7 @@
     ],
     "joining_location_ids": {
         "north": "tavern",
+        "west": "hall_of_heroes",
         "down": "dungeon_1_1"
     },
     "joining_message": "%s has arrived.",

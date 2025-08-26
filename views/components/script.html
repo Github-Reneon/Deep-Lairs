@@ -5,7 +5,7 @@
 
   function connect() {
     lairsDiv.innerHTML = "";
-    ws = new WebSocket("ws://mud.runeco.de:80/ws");
+    ws = new WebSocket("ws://localhost:3000/ws");
 
     ws.onopen = () => {
       appendOutput("Connected to the server.");

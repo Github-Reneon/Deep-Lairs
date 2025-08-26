@@ -1,0 +1,26 @@
+{
+  "id": "hall_of_heroes",
+  "name": "The Hall of Heroes",
+  "description": "This is the Hall of Heroes, a revered chamber dedicated to the memory and celebration of legendary figures. Statues and portraits line the walls, honoring those whose deeds shaped history. Visitors come to reflect on courage, sacrifice, and the stories that inspire generations.",
+  "look": "The walls are adorned with banners and shields, each telling a story of bravery and valor. A large chandelier hangs from the ceiling, casting a warm glow over the room. In the center, a pedestal holds a glowing sword, said to be wielded by the greatest hero of all time. The first hero of them all is said to be Jordan the Bard, who once sang so beautifully that a dragon fell asleep and was captured by the townsfolk, saving them all. The town square is just \u003cspan class=\"font-bold underline\"\u003eout\u003c/span\u003eside.",
+  "title_look": "You see statues and portraits of legendary heroes from ages past",
+  "look_image": "drinks.webp",
+  "location_image": "tavern.webp",
+  "jingles": [
+    "Tourists marvel at the statues and portraits, whispering tales of old.",
+    "A bard begins to play a haunting melody, echoing through the hall.",
+    "A group of adventurers enters the hall, their eyes wide with awe.",
+    "A historian passionately recounts the tales of the heroes depicted on the walls.",
+    "A child tugs at their parent's sleeve, pointing excitedly at a statue.",
+    "The chandelier flickers, casting dancing shadows on the walls.",
+    "You feel a sense of inspiration and courage wash over you.",
+    "A scholar pores over an ancient tome, taking notes.",
+    "A knight in shining armor stands proudly beside a statue, reminiscing about their own adventures.",
+    "A gentle breeze rustles the banners, as if the heroes themselves are alive."
+  ],
+  "joining_location_ids": {
+    "out": "square"
+  },
+  "joining_message": "%s walks in.",
+  "leaving_message": "%s walks out, going %s."
+}

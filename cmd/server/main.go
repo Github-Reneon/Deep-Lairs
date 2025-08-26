@@ -44,10 +44,10 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	id := uuid.New().String()
 
-	world.Places["tavern"].AddUser(&gameobjects.User{
+	world.Places["hall_of_heroes"].AddUser(&gameobjects.User{
 		ID:       id,
 		Name:     "Adventurer",
-		Location: world.Places["tavern"],
+		Location: world.Places["hall_of_heroes"],
 	})
 
 	user := gameobjects.GetUser(&world, id)
