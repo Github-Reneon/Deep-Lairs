@@ -272,3 +272,12 @@ func UserUnequip(splitMsg []string, user *gameobjects.User) {
 	}
 	user.UnequipItem(item)
 }
+
+func UserDo(splitMsg []string, user *gameobjects.User) {
+	if len(splitMsg) < 2 {
+		user.AddMessage("Usage: do <action>")
+		return
+	}
+	actionName := strings.Join(splitMsg[1:], " ")
+	user.Location.AddMessage(fmt.Sprintf(protocol.DO, user.GetName(), actionName))
+}

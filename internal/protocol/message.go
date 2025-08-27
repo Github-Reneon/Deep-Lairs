@@ -22,6 +22,7 @@ const (
 	IMAGE              = "<img src=\"/img/%s\" class=\"img-fluid w-100 m-4 rounded-lg starting:opacity-0 opacity-100 transition-all duration-700 delay-200 ease-in-out \" />"
 	WHISPER            = "%s whispers to %s: \"<span class=\"italic\">%s</span>\""
 	WHISPER_FAIL       = "There's no adventurer %s here."
+	DO                 = "%s starts to %s"
 )
 
 type Message struct {

@@ -66,7 +66,9 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	user.Save()
 
+	user.AddMessage(fmt.Sprintf(protocol.IMAGE, "logo.webp"))
 	user.AddMessage(fmt.Sprintf("User %s connected", user.GetName()))
+
 	g, ctx := errgroup.WithContext(context.Background())
 
 	UserJoin(user)
@@ -209,6 +211,8 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				UserEquip(splitMsg, user)
 			case "unequip", "ue":
 				UserUnequip(splitMsg, user)
+			case "do", "d":
+				UserDo(splitMsg, user)
 			default:
 				user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, firstWord))
 			}
