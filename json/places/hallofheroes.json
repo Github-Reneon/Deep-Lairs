@@ -4,8 +4,8 @@
   "description": "This is the Hall of Heroes, a revered chamber dedicated to the memory and celebration of legendary figures. Statues and portraits line the walls, honoring those whose deeds shaped history. Visitors come to reflect on courage, sacrifice, and the stories that inspire generations.",
   "look": "The walls are adorned with banners and shields, each telling a story of bravery and valor. A large chandelier hangs from the ceiling, casting a warm glow over the room. In the center, a pedestal holds a glowing sword, said to be wielded by the greatest hero of all time. The first hero of them all is said to be Jordan the Bard, who once sang so beautifully that a dragon fell asleep and was captured by the townsfolk, saving them all. The town square is just \u003cspan class=\"font-bold underline\"\u003eout\u003c/span\u003eside.",
   "title_look": "You see statues and portraits of legendary heroes from ages past",
-  "look_image": "hall_of_heroes.webp",
-  "location_image": "jordan.webp",
+  "look_image": "jordan.webp",
+  "location_image": "hall_of_heroes.webp",
   "jingles": [
     "Tourists marvel at the statues and portraits, whispering tales of old.",
     "A bard begins to play a haunting melody, echoing through the hall.",
