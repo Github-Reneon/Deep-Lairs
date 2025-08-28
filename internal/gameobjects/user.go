@@ -15,17 +15,23 @@ import (
 var userLocks sync.Map
 
 type User struct {
-	ID               string   `json:"id"`
-	Name             string   `json:"name"`
-	Location         *Place   `json:"-"`
-	LocationId       string   `json:"location"`
-	MessageQueue     []string `json:"-"`
-	Looked           bool     `json:"-"`
-	KnownLocations   []*Place `json:"-"`
-	KnownLocationIds []string `json:"known_locations"`
-	Busy             bool     `json:"-"`
-	changed          bool     `json:"-"`
+	ID               string      `json:"id"`
+	Name             string      `json:"name"`
+	Location         *Place      `json:"-"`
+	LocationId       string      `json:"location"`
+	MessageQueue     []string    `json:"-"`
+	Looked           bool        `json:"-"`
+	KnownLocations   []*Place    `json:"-"`
+	KnownLocationIds []string    `json:"known_locations"`
+	Busy             bool        `json:"-"`
+	changed          bool        `json:"-"`
+	fighting         *IFightable `json:"-"`
 	UserFightable
+}
+
+type IFightable interface {
+	BeAttacked(attackRoll int) int
+	BeDamaged(damage int) int
 }
 
 type UserFightable struct {

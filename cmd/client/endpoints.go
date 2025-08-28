@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetIndex(c *fiber.Ctx) error {
+func GetGame(c *fiber.Ctx) error {
 	// set content type to html
 	c.Set("Content-Type", "text/html")
 	WebSocketURL := protocol.DEV_WS_LINK

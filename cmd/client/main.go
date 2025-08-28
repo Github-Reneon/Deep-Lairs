@@ -48,7 +48,10 @@ func main() {
 		return c.Next()
 	})
 
-	app.Get("/", GetIndex)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/game")
+	})
+	app.Get("/game", GetGame)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)
