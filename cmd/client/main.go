@@ -3,12 +3,23 @@ package main
 import (
 	"deep_lairs/internal/protocol"
 	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 )
 
+var Prod = false
+
 func main() {
+
+	// if --prod then prod = true
+	if len(os.Args) > 1 && os.Args[1] == "--prod" {
+		Prod = true
+		fmt.Println("Running in production mode")
+	} else {
+		fmt.Println("Running in development mode")
+	}
 
 	engine := html.New("./views", ".html")
 
