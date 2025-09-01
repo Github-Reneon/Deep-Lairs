@@ -51,6 +51,9 @@ func main() {
 	app.Get("/character_creation", GetCharacterCreation)
 	app.Get("/", GetIndex)
 	app.Get("/game", GetGame)
+	app.Get("/login", GetLogin)
+	app.Post("/login", PostLogin)
+	app.Get("/signup", GetSignup)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)

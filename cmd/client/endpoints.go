@@ -27,6 +27,22 @@ func GetIndex(c *fiber.Ctx) error {
 	})
 }
 
+func GetLogin(c *fiber.Ctx) error {
+	// set content type to html
+	c.Set("Content-Type", "text/html")
+	return c.Render("login", fiber.Map{
+		"Version": "0.1.0",
+	})
+}
+
+func GetSignup(c *fiber.Ctx) error {
+	// set content type to html
+	c.Set("Content-Type", "text/html")
+	return c.Render("signup", fiber.Map{
+		"Version": "0.1.0",
+	})
+}
+
 func PostLogin(c *fiber.Ctx) error {
 	if err := c.BodyParser(&struct {
 		Username string `json:"username"`
