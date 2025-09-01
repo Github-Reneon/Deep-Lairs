@@ -21,8 +21,8 @@ import (
 )
 
 var world = gameobjects.World{
-	Places:       make(map[string]*gameobjects.Place),
-	CurrentUsers: 0,
+	Places:            make(map[string]*gameobjects.Place),
+	CurrentCharacters: 0,
 }
 
 var upgrader = websocket.Upgrader{
@@ -44,13 +44,13 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	id := uuid.New().String()
 
-	world.Places["hall_of_heroes"].AddUser(&gameobjects.User{
+	world.Places["hall_of_heroes"].AddCharacter(&gameobjects.Character{
 		ID:       id,
 		Name:     "Adventurer",
 		Location: world.Places["hall_of_heroes"],
 	})
 
-	user := gameobjects.GetUser(&world, id)
+	user := gameobjects.GetCharacter(&world, id)
 
 	user.AddKnownLocation(world.Places["tavern"])
 	// comment stats
@@ -67,15 +67,15 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	user.Save()
 
 	user.AddMessage(fmt.Sprintf(protocol.IMAGE, "logo.webp"))
-	user.AddMessage(fmt.Sprintf("User %s connected", user.GetName()))
+	user.AddMessage(fmt.Sprintf("Character %s connected", user.GetName()))
 
 	g, ctx := errgroup.WithContext(context.Background())
 
-	UserJoin(user)
+	CharacterJoin(user)
 
 	go user.StartCalcStatsHandler()
 	go user.StartSetIdsHandler()
-	SendUserState(user)
+	SendCharacterState(user)
 
 	defer conn.Close()
 
@@ -94,7 +94,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gameobjects.User) error {
+func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gameobjects.Character) error {
 	for {
 		message := ""
 		select {
@@ -105,8 +105,8 @@ func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				message = user.MessageQueue[0]
 				if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 					log.Println("Error writing message:", err)
-					user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
-					user.Location.RemoveUser(user, "poof")
+					user.Location.AddMessage(fmt.Sprintf("Character %s disconnected", user.GetName()))
+					user.Location.RemoveCharacter(user, "poof")
 					return err
 				} else {
 					user.ClearLastMessage()
@@ -118,7 +118,7 @@ func handleOutgoingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 	}
 }
 
-func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gameobjects.User) error {
+func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gameobjects.Character) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -127,8 +127,8 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("Error reading message:", err)
-				user.Location.AddMessage(fmt.Sprintf("User %s disconnected", user.GetName()))
-				user.Location.RemoveUser(user, "poof")
+				user.Location.AddMessage(fmt.Sprintf("Character %s disconnected", user.GetName()))
+				user.Location.RemoveCharacter(user, "poof")
 				return err
 			}
 			// basic parse message replace soon
@@ -142,18 +142,18 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 
 			switch firstWord {
 			case "say", "s":
-				UserSay(splitMsg, user)
+				CharacterSay(splitMsg, user)
 			case "shout", "sh":
-				UserShout(splitMsg, user)
+				CharacterShout(splitMsg, user)
 			case "look", "l":
 				if !user.Looked {
-					UserLook(splitMsg, user)
+					CharacterLook(splitMsg, user)
 					user.Looked = true
 				} else {
-					UserQuickLook(splitMsg, user)
+					CharacterQuickLook(splitMsg, user)
 				}
 			case "quick_look", "ql":
-				UserQuickLook(splitMsg, user)
+				CharacterQuickLook(splitMsg, user)
 			case "set_name":
 				if len(splitMsg) == 2 {
 					user.Name = splitMsg[1]
@@ -161,17 +161,17 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					user.AddMessage("Usage: set_name <name>")
 				}
-				SendUserState(user)
+				SendCharacterState(user)
 			case "go", "g":
-				knownLocation, err := UserGo(splitMsg, user)
+				knownLocation, err := CharacterGo(splitMsg, user)
 				if err != nil {
-					log.Println("Error in UserGo:", err)
+					log.Println("Error in CharacterGo:", err)
 					break
 				}
 				if !knownLocation {
-					UserJoin(user)
+					CharacterJoin(user)
 				} else {
-					UserWhere(splitMsg, user)
+					CharacterWhere(splitMsg, user)
 				}
 			case "givexp":
 				if len(splitMsg) == 2 {
@@ -184,7 +184,7 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					user.AddMessage("Usage: givexp <amount>")
 				}
-				SendUserState(user)
+				SendCharacterState(user)
 			case "flipcombat":
 				user.InCombat = !user.InCombat
 				if user.InCombat {
@@ -192,27 +192,27 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, user *gam
 				} else {
 					user.AddMessage("You are no longer in combat.")
 				}
-				SendUserState(user)
+				SendCharacterState(user)
 			case "where", "w":
-				UserWhere(splitMsg, user)
+				CharacterWhere(splitMsg, user)
 			case "time", "t":
 				user.AddMessage(fmt.Sprintf("Current server time: %s", time.Now().Format(time.RFC1123)))
 			case "questboard", "qb":
-				UserQuestBoard(splitMsg, user)
+				CharacterQuestBoard(splitMsg, user)
 			case "help":
 				user.AddMessage("Available commands: say, look, set_name, help")
 			case "lol", "lmao":
-				UserLaugh(user)
+				CharacterLaugh(user)
 			case "se", "search":
-				UserSearch(splitMsg, user)
+				CharacterSearch(splitMsg, user)
 			case "i", "inv", "inventory":
-				UserInventory(user)
+				CharacterInventory(user)
 			case "equip", "eq":
-				UserEquip(splitMsg, user)
+				CharacterEquip(splitMsg, user)
 			case "unequip", "ue":
-				UserUnequip(splitMsg, user)
+				CharacterUnequip(splitMsg, user)
 			case "do", "d":
-				UserDo(splitMsg, user)
+				CharacterDo(splitMsg, user)
 			default:
 				user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, firstWord))
 			}
@@ -247,7 +247,7 @@ func main() {
 		// and NPCs
 		place.Init(&world)
 		go place.StartMessageHandler()
-		go place.StartCheckUsersHandler()
+		go place.StartCheckCharactersHandler()
 	}
 	go world.StartJingleHandler()
 
