@@ -37,6 +37,7 @@ func UserSay(splitMsg []string, user *gameobjects.User) {
 	} else {
 		message := fmt.Sprintf(
 			protocol.SAY,
+			"/img/portraits/"+user.Image,
 			user.GetName(),
 			strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:],
 		)

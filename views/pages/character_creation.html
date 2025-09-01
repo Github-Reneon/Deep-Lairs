@@ -1,0 +1,442 @@
+{{ define "character_creation" }}
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head" . }}
+<!-- tailwind fantasy theming -->
+
+<body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white antialiased">
+  <div class="flex flex-col justify-center items-center">
+    <img src="/img/logo.webp" alt="Deep Lairs Logo" class="mb-4 w-100 h-100">
+    <div class="container flex flex-col items-center">
+      <div
+        class="w-full md:mx-4 bg-white dark:bg-gray-800 p-8 rounded shadow border-2 border-gray-500 dark:border-none dark:border-0 shadow-black shadow-lg mb-10">
+        <div>
+          <h2 class="text-2xl font-bold mb-6 text-center">Create Your Character</h2>
+          <form action="/create_character" method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 2xl:grid-cols-3 gap-6">
+              <div class="xl:col-span-2 space-y-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-6 mx-auto mb-4">
+                  <div>
+                    <label for="name" class="block mb-2 text-sm font-medium">Character First Name</label>
+                    <input type="text" id="name" name="name_last" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                  </div>
+                  <div>
+                    <label for="name" class="block mb-2 text-sm font-medium">Character Last Name</label>
+                    <input type="text" id="name" name="name_last" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                  </div>
+                </div>
+                <div>
+                  <label for="stats" class="block mb-2 text-sm font">Character Base Attributes</label>
+                  <label for="stats" class="block mb-2 text-xs italic">Distribute points between 1 and 6, default is 2.
+                    (Total must equal 15)</label>
+                  <label id="points_total" for="stats" class="block mb-2 text-md font-bold">(POINTS_TOTAL)</label>
+                  <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 xl:gap-6 mx-auto mb-4 xl:px-12">
+                    <div>
+                      <label for="strength" class="block mb-1 text-sm font-medium">Strength</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="strength_input"
+                        name="strength" min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                    <div>
+                      <label for="constitution_input" class="block mb-1 text-sm font-medium">Constitution</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="constitution_input"
+                        name="constitution" min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                    <div>
+                      <label for="dexterity_input" class="block mb-1 text-sm font-medium">Dexterity</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="dexterity_input"
+                        name="dexterity" min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                    <div>
+                      <label for="speed_input" class="block mb-1 text-sm font-medium">Speed</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="speed_input" name="speed"
+                        min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                    <div>
+                      <label for="intelligence_input" class="block mb-1 text-sm font-medium">Intelligence</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="intelligence_input"
+                        name="intelligence" min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                    <div>
+                      <label for="wisdom_input" class="block mb-1 text-sm font-medium">Wisdom</label>
+                      <input onchange="pointschange(); changefinalstats()" type="number" id="wisdom_input" name="wisdom"
+                        min="1" max="6" value="2" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-6 mx-auto mb-4">
+                  <div>
+                    <label for="class" class="block mb-2 text-sm font-medium">Class</label>
+                    <select id="class" name="class" onchange="changeclassdescription(); changefinalstats()" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                      <option value=""></option>
+                      <option value="warrior">Warrior</option>
+                      <option value="rogue" disabled title="Coming Soon">Rogue</option>
+                      <option value="ranger" disabled title="Coming Soon">Ranger</option>
+                      <option value="mage">Mage</option>
+                      <option value="cleric" disabled title="Coming Soon">Cleric</option>
+                    </select>
+                    <label for="class" id="class_description" class="block mt-2 text-xs italic"></label>
+                  </div>
+                  <div>
+                    <label for="race" class="block mb-2 text-sm font">Race</label>
+                    <select id="race" name="race"
+                      onchange="changeraceportrait(); changeracedescription(); changefinalstats()" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                      <option value=""></option>
+                      <option value="human">Human</option>
+                      <option value="elf">Elf</option>
+                      <option value="dwarf">Dwarf</option>
+                      <option value="orc" disabled title="Coming Soon">Half Orc</option>
+                      <option value="gnome" disabled title="Coming Soon">Gnome</option>
+                      <option value="halfling" disabled title="Coming Soon">Halfling</option>
+                      <option value="half-elf" disabled title="Coming Soon">Half Elf</option>
+                      <option value="diablin" disabled title="Coming Soon">Diablin</option>
+                      <option value="temparii" disabled title="Coming Soon">Luxian</option>
+                      <option value="dragonborn" disabled title="Coming Soon">Dragonborn</option>
+                      <option value="deep_elf" disabled title="Coming Soon">Deep Elf</option>
+                    </select>
+                    <label for="race" id="race_description" class="block mt-2 text-xs italic"></label>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-6 mx-auto mb-4">
+                  <div>
+                    <label for="god" class="block mb-2 text-sm font">God</label>
+                    <select id="god" name="god" onchange="changegoddescription(); changefinalstats()" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                      <option value=""></option>
+                      <option value="none">None/Athiest</option>
+                      <option value="Glarkind">Glarkind (the All-Father)</option>
+                      <option value="Zanothia">Zanothia (the Trickster)</option>
+                      <option value="Oa">Oa (the Prime Magician)</option>
+                    </select>
+                    <label for="god" id="god_description" class="block mt-2 text-xs italic"></label>
+                  </div>
+                  <div>
+                    <label for="boon" class="block mb-2 text-sm font-medium">Character Boon</label>
+                    <select id="boon" name="boon" onchange="changeboondescription(); changefinalstats()" required
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800">
+                      <option value=""></option>
+                      <option value="luck">Luck of the Gods</option>
+                      <option value="wisdom">Wisdom of the Ages</option>
+                      <option value="faction">Faction Favourite</option>
+                      <option value="twoquest">Multitasker</option>
+                    </select>
+                    <label for="boon" id="boon_description" class="block mt-2 text-xs italic"></label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-span-1 flex flex-col justify-center">
+                <label for="portrait" class="block mb-2 text-sm font-medium">Character Portrait</label>
+                <div class="flex flex-col items-center mb-2">
+                  <img id="portrait_preview" src="/img/portraits/portrait_hmm.webp" alt="Portrait Preview"
+                    class="mb-2 w-100 h-100 object-cover rounded-4xl border-4 border-gray-300 shadow shadow-md shadow-black dark:shadow-gray-600">
+                  <input type="number" id="portrait" name="portrait" min="1" max="12" value="" disabled required
+                    class="bg-transparent border-none text-center mb-4" onchange="changeraceportrait()">
+                  <div class="flex flex-row gap-3">
+                    <button type="button"
+                      onclick="document.getElementById('portrait').stepDown(); changeraceportrait();"
+                      class="bg-gray-300 text-gray-800 px-3 py-1 w-20 rounded hover:bg-gray-400 transition duration-100 ease-in-out">Prev</button>
+                    <button type="button" onclick="document.getElementById('portrait').stepUp(); changeraceportrait();"
+                      class="bg-gray-300 text-gray-800 px-3 py-1 w-20 rounded hover:bg-gray-400 transition duration-100 ease-in-out">Next</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="final_stats" class="mb-4 w-full">
+              <label for="final_stats" class="block mb-2 text-sm font-medium">Final Character Stats</label>
+              <ul class="list-inside grid grid-cols-2 md:grid-cols-3 gap-2">
+                <li><span class="font-bold">Health:</span> <span id="final_health"></span></li>
+                <li><span class="font-bold">Mana:</span> <span id="final_mana"></span></li>
+                <li><span class="font-bold">Stamina:</span> <span id="final_stamina"></span></li>
+                <li><span class="font-bold">Base AC:</span> <span id="final_ac"></span></li>
+                <li><span class="font-bold">Strength:</span> <span id="final_strength"></span></li>
+                <li><span class="font-bold">Constitution:</span> <span id="final_constitution"></span></li>
+                <li><span class="font-bold">Dexterity:</span> <span id="final_dexterity"></span></li>
+                <li><span class="font-bold">Speed:</span> <span id="final_speed"></span></li>
+                <li><span class="font-bold">Intelligence:</span> <span id="final_intelligence"></span></li>
+                <li><span class="font-bold">Wisdom:</span> <span id="final_wisdom"></span></li>
+                <li><span class="font-bold">Boon & Bonus:</span> <span id="final_boon"></span></li>
+                <li><span class="font-bold">God & Bonus:</span> <span id="final_god"></span></li>
+                <li><span class="font-bold">Class Skill:</span> <span id="final_class_skill"></span></li>
+                <li><span class="font-bold">Racial Skill:</span> <span id="final_racial_skill">TBD</span></li>
+                <li><span class="font-bold">Spell Slots:</span> <span id="final_spellslots"></span></li>
+              </ul>
+            </div>
+            <div>
+              <label for="background" class="block mb-2 text-sm font-medium">Character Background</label>
+              <textarea id="background" name="background" rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800"
+                placeholder="What is thy story?"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Create
+              Character</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      function pointschange() {
+        let strength = parseInt(document.getElementById("strength_input").value);
+        let constitution = parseInt(document.getElementById("constitution_input").value);
+        let dexterity = parseInt(document.getElementById("dexterity_input").value);
+        let speed = parseInt(document.getElementById("speed_input").value);
+        let intelligence = parseInt(document.getElementById("intelligence_input").value);
+        let wisdom = parseInt(document.getElementById("wisdom_input").value);
+        let total = strength + constitution + dexterity + speed + intelligence + wisdom;
+        document.getElementById("points_total").innerText = "(" + total + " / 15 Points Used)";
+        if (total != 15) {
+          document.getElementById("points_total").classList.add("text-red-600");
+          document.getElementById("points_total").classList.remove("text-green-600");
+        } else {
+          document.getElementById("points_total").classList.remove("text-red-600");
+          document.getElementById("points_total").classList.add("text-green-600");
+        }
+      }
+
+      function changeraceportrait() {
+        // this is the old one
+        // document.getElementById('portrait_preview').src='/img/portraits/portrait_' + document.getElementById('race').value + '_' + this.value + '.webp';
+        let portrait_num = parseInt(document.getElementById('portrait').value);
+        let portrait_race = document.getElementById('race').value.toLowerCase();
+        // if not number
+        if (portrait_race === "") {
+          return;
+        }
+        if (isNaN(portrait_num)) {
+          document.getElementById('portrait_preview').src = '/img/portraits/portrait_hmm.webp';
+        } else {
+          document.getElementById('portrait_preview').src = '/img/portraits/portrait_' + portrait_race + '_' + portrait_num + '.webp';
+        }
+      }
+
+      function changegoddescription() {
+        let god = document.getElementById('god').value;
+        let description = "";
+        switch (god) {
+          case "none":
+            description = "You follow no god, and rely on your own strength and wits. Coming to this decision took a lot of thought, leading you to gain +1 to Wisdom.";
+            break;
+          case "Glarkind":
+            description = "Glarkind, the All-Father, values strength and honor above all. Warriors who follow him are often brave and steadfast in battle. His followers gain +1 to Strength.";
+            break;
+          case "Zanothia":
+            description = "Zanothia, the Trickster, is the patron of rogues and those who value cunning and agility. Her followers are often quick-witted and resourceful. Her followers gain +1 to Dexterity.";
+            break;
+          case "Oa":
+            description = "Oa, the Prime Magician, is revered by mages and scholars. Those who follow Oa seek knowledge and wisdom, often delving into the mysteries of magic. Her followers gain +1 to Intelligence.";
+            break;
+          default:
+            description = "";
+        }
+        document.getElementById('god_description').innerText = description;
+      }
+
+      function changeboondescription() {
+        let boon = document.getElementById('boon').value;
+        let description = "";
+        switch (boon) {
+          case "luck":
+            description = "You have been blessed with the Luck of the Gods, increasing your chances of finding gold during your adventures by 5%.";
+            break;
+          case "wisdom":
+            description = "You possess the Wisdom of the Ages, allowing you to gain experience points more quickly. You earn 4% more XP from all sources.";
+            break;
+          case "faction":
+            description = "You are a Faction Favourite, earning reputation with factions at an accelerated rate. You gain 10% more reputation from all faction-related activities.";
+            break;
+          case "twoquest":
+            description = "You are a Multitasker, capable of undertaking two epic quests simultaneously.";
+            break;
+          default:
+            description = "";
+        }
+        document.getElementById('boon_description').innerText = description;
+      }
+
+      function changeracedescription() {
+        let race = document.getElementById('race').value;
+        let description = "";
+        switch (race) {
+          case "human":
+            description = "Humans are versatile and ambitious, known for their adaptability and resilience. They have the rally skill from game start.";
+            break;
+          case "elf":
+            description = "Elves are graceful and intelligent, with a natural affinity for magic and the arts. They have the enchanting skill from game start.";
+            break;
+          case "dwarf":
+            description = "Dwarves are sturdy and strong, renowned for their craftsmanship and endurance. They can see in the dark, and have the smithing skill from game start.";
+            break;
+          default:
+            description = "";
+        }
+        document.getElementById('race_description').innerText = description;
+      }
+
+      function changeclassdescription() {
+        let classsel = document.getElementById('class').value;
+        let description = "";
+        switch (classsel) {
+          case "warrior":
+            description = "Warriors are masters of melee combat, excelling in strength and endurance. At game start they can use shortswords, and bows. They start with the cleave skill.";
+            break;
+          case "rogue":
+            description = "Rogues are stealthy and agile, skilled in sneaking and dealing critical hits. At game start they know how to use daggars. They start with the trickstab skill.";
+            break;
+          case "ranger":
+            description = "Rangers are expert marksmen and survivalists, adept at ranged combat and tracking. They start with the aim skill.";
+            break;
+          case "mage":
+            description = "Mages wield powerful spells, using their intelligence to manipulate the elements. They start with the fireball skill, and are garaunteed one mana and one spellslot at game start.";
+            break;
+          case "cleric":
+            description = "Clerics are holy warriors, combining martial prowess with divine magic. They start with the heal skill.";
+            break;
+          default:
+            description = "";
+        }
+        document.getElementById('class_description').innerText = description;
+      }
+
+      function changefinalstats() {
+        let strength = parseInt(document.getElementById("strength_input").value);
+        let constitution = parseInt(document.getElementById("constitution_input").value);
+        let dexterity = parseInt(document.getElementById("dexterity_input").value);
+        let speed = parseInt(document.getElementById("speed_input").value);
+        let intelligence = parseInt(document.getElementById("intelligence_input").value);
+        let wisdom = parseInt(document.getElementById("wisdom_input").value);
+        let god = document.getElementById('god').value;
+        let boon = document.getElementById('boon').value;
+        let classsel = document.getElementById('class').value;
+        let racesel = document.getElementById('race').value;
+        let spellslotmin = 0;
+
+
+        if (classsel == "mage") {
+          spellslotmin = 1;
+        }
+
+
+        // God bonus
+        let god_bonus = "";
+        switch (god) {
+          case "none":
+            wisdom += 1;
+            god_bonus = "+1 Wisdom";
+            break;
+          case "Glarkind":
+            strength += 1;
+            god_bonus = "+1 Strength";
+            break;
+          case "Zanothia":
+            dexterity += 1;
+            god_bonus = "+1 Dexterity";
+            break;
+          case "Oa":
+            intelligence += 1;
+            god_bonus = "+1 Intelligence";
+            break;
+          default:
+            god_bonus = "None";
+        }
+
+        // Base stats
+        let health = Math.ceil(3 + (constitution / 2));
+        let mana = Math.max(spellslotmin, Math.ceil(-2 + (intelligence / 2) + (wisdom / 3)));
+        let stamina = Math.ceil(2 + (strength / 2) + (dexterity / 3));
+        let ac = Math.ceil((dexterity / 2) + (speed / 4) + (constitution / 5));
+        let spellslots = Math.max(spellslotmin, Math.ceil((wisdom - 3) / 2));
+
+        // Boon bonus
+        let boon_bonus = "";
+        switch (boon) {
+          case "luck":
+            boon_bonus = "5% more gold found";
+            break;
+          case "wisdom":
+            boon_bonus = "4% more XP gained";
+            break;
+          case "faction":
+            boon_bonus = "10% more faction reputation";
+            break;
+          case "twoquest":
+            boon_bonus = "Can undertake two epic quests simultaneously";
+            break;
+          default:
+            boon_bonus = "None";
+        }
+
+        // Class skill
+        let class_skill = "";
+        switch (classsel) {
+          case "warrior":
+            class_skill = "Cleave (A melee attack that hits more accurately at the cost of stamina)";
+            break;
+          case "rogue":
+            class_skill = "Trickstab (A powerful backstab attack that deals extra damage at the cost of stamina)";
+            break;
+          case "ranger":
+            class_skill = "Track (Searches take half the time)";
+            break;
+          case "mage":
+            class_skill = "Fireball (A spell that deals fire damage to an enemy at the cost of mana)";
+            break;
+          default:
+            class_skill = "None";
+            break;
+        }
+
+        let racial_skill = "";
+        switch (racesel) {
+          case "human":
+            racial_skill = "Rally (Once per rest can regain health equal to half max health)";
+            break;
+          case "elf":
+            racial_skill = "Enchanting (Can imbue weapons with magical properties at an enchanting table)";
+            break;
+          case "dwarf":
+            racial_skill = "Smithing (Can craft and upgrade armor and weapons at a forge)";
+            break;
+          default:
+            racial_skill = "None";
+            break;
+        }
+
+        document.getElementById("final_health").innerText = health;
+        document.getElementById("final_mana").innerText = mana;
+        document.getElementById("final_stamina").innerText = stamina;
+        document.getElementById("final_ac").innerText = ac;
+        document.getElementById("final_strength").innerText = strength;
+        document.getElementById("final_constitution").innerText = constitution;
+        document.getElementById("final_dexterity").innerText = dexterity;
+        document.getElementById("final_speed").innerText = speed;
+        document.getElementById("final_intelligence").innerText = intelligence;
+        document.getElementById("final_wisdom").innerText = wisdom;
+        document.getElementById("final_god").innerText = god + " (" + god_bonus + ")";
+        document.getElementById("final_boon").innerText = boon + " (" + boon_bonus + ")";
+        document.getElementById("final_class_skill").innerText = class_skill;
+        document.getElementById("final_spellslots").innerText = spellslots;
+        document.getElementById("final_racial_skill").innerText = racial_skill;
+      }
+
+      // initialize points change
+      pointschange();
+      changeraceportrait();
+      changegoddescription();
+      changeboondescription();
+      changeracedescription();
+      changeclassdescription();
+      changefinalstats();
+    </script>
+</body>
+
+</html>
+{{ end }}

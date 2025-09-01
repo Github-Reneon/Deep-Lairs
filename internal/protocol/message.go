@@ -14,7 +14,7 @@ const (
 const (
 	LOOK               = "<b>%s</b> %s<br><img src=\"/img/%s\" class=\"img-fluid w-100 m-4 rounded-lg starting:opacity-0 opacity-100 transition-all duration-700 delay-200 ease-in-out \" />"
 	LOOK_NO_IMAGE      = "<b>%s</b> %s"
-	SAY                = "%s says: \"%s\""
+	SAY                = "<span class=\"inline-flex items-baseline\"> <img src=\"%s\" class=\"mx-1 size-7 self-center rounded-full\" /> <span>%s</span></span> says: \"%s\""
 	I_DONT_KNOW_HOW_TO = "I don't know how to %s"
 	SHOUT              = "%s shouts: <b>\"%s\"</b>"
 	LOL                = "%s laughs out loud! 😂"

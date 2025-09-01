@@ -48,9 +48,8 @@ func main() {
 		return c.Next()
 	})
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Redirect("/game")
-	})
+	app.Get("/character_creation", GetCharacterCreation)
+	app.Get("/", GetIndex)
 	app.Get("/game", GetGame)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {

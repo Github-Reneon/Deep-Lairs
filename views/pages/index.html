@@ -2,31 +2,24 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deep Lairs</title>
-  <link rel="stylesheet" href="/css/tailwind.css">
-</head>
+{{ template "head" . }}
 
-<body class="bg-green-900 text-white h-screen">
-  <p class="absolute left-0 top-0 p-4 text-sm">Version {{ .Version }}</p>
-  <div class="container mx-auto xl:pt-4 h-full">
-    <div id="content" class="bg-gray-700 p-5 xl:rounded-t-3xl shadow-2xl shadow-black h-full flex flex-col">
-      <h1 class="text-3xl font-bold mb-4 w-full bg-gray-700 flex-none">Deep Lairs</h1>
-      <div id="lairs_container"
-        class="overflow-y-auto flex-1 h-full bg-black m-2 rounded-md p-4 flex flex-col items-end">
-        {{ template "status_bars" . }}
-        <div id="lairs" class="flex flex-col justify-end h-auto">
-        </div>
-      </div>
-      <div id=" input-area" class="mt-4 flex-none">
-        <input type="text" id="lair-input" class="w-full p-2 rounded bg-gray-800 text-white"
-          placeholder="What do you do traveler?">
+<body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white">
+  <div class="flex h-screen w-screen flex-col justify-center xl:flex-row xl:justify-around items-center">
+    <img src="/img/logo.webp" alt="Deep Lairs Logo" class="mb-4 w-100 h-100">
+    <div>
+      <h1
+        class="text-4xl font-bold mb-4 text-m font-stretch-condensed text-center text-shadow text-shadow-xs text-shadow-black dark:text-shadow-none">
+        Welcome to Deep
+        Lairs</h1>
+      <p class="mb-6 text-shadow text-shadow-black text-shadow-2xs dark:text-shadow-none">Embark on an epic text-based
+        adventure!</p>
+      <div class="flex justify-center xl:justify-normal">
+        <a href="/login" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition">Start Your
+          Journey</a>
       </div>
     </div>
   </div>
-  {{ template "script" . }}
 </body>
 
 </html>

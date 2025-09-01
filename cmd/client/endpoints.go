@@ -13,8 +13,39 @@ func GetGame(c *fiber.Ctx) error {
 	if Prod {
 		WebSocketURL = protocol.PROD_WS_LINK
 	}
-	return c.Render("index", fiber.Map{
+	return c.Render("game", fiber.Map{
 		"Version":      "0.1.0",
 		"WebSocketURL": WebSocketURL,
+	})
+}
+
+func GetIndex(c *fiber.Ctx) error {
+	// set content type to html
+	c.Set("Content-Type", "text/html")
+	return c.Render("index", fiber.Map{
+		"Version": "0.1.0",
+	})
+}
+
+func PostLogin(c *fiber.Ctx) error {
+	if err := c.BodyParser(&struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}{}); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+	c.Set("Content-Type", "application/json")
+	return c.JSON(fiber.Map{
+		"status": "success",
+	})
+}
+
+func GetCharacterCreation(c *fiber.Ctx) error {
+	// set content type to html
+	c.Set("Content-Type", "text/html")
+	return c.Render("character_creation", fiber.Map{
+		"Version": "0.1.0",
 	})
 }

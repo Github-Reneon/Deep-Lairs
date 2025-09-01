@@ -237,6 +237,7 @@ func (u *User) Init(health, attack, defense, mana, stamina, speed, intelligence 
 	u.XP = 0
 	u.MaxXP = 100
 	u.Level = 1
+	u.Image = "portrait_human_8.webp"
 }
 
 // SetIds assigns unique IDs to the user and their items.

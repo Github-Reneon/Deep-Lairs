@@ -1,18 +1,24 @@
 {{ define "status_bars" }}
-<div id="status-bars" class="absolute p-4 -mr-4 -mt-4 rounded-bl-lg bg-gray-700 flex flex-row gap-2 ">
+<div id="status-bars" class="absolute p-4 -mr-4 -mt-4 rounded-bl-lg bg-gray-700 flex flex-row gap-2 h-40">
     <div id="enemy-status-bar" class="w-70 bg-gray-700 flex flex-col gap-2 hidden">
         <span id="Enemy-Name" class="bg-gray-800 w-full px-2 rounded-md">Skeleton</span>
         <span id="Enemy-Health" class="bg-amber-700 w-full px-2 rounded-md"></span>
         <span id="XP-to-gain" class="bg-yellow-600 w-full px-2 rounded-md text-center"></span>
     </div>
-    <div id="status-bar" class="w-70 bg-gray-700 flex flex-col gap-2">
-        <span id="Name" class="bg-gray-800 w-full px-2 rounded-md">Reneon</span>
-        <div class="grid grid-cols-3 gap-1">
-            <span id="Health" class="bg-amber-700 w-full px-2 rounded-md"></span>
-            <span id="Mana" class="bg-cyan-700 w-full px-2 rounded-md"></span>
-            <span id="Stamina" class="bg-yellow-700 w-full px-2 rounded-md"></span>
+    <div id="status-bar" class="w-100 bg-gray-700 flex flex-col gap-2">
+        <div class="flex flex-row gap-2">
+            <div class="w-full flex flex-col gap-2">
+                <span id="Name" class="bg-gray-800 w-full px-2 rounded-md">Reneon</span>
+                <div class="grid grid-cols-3 gap-1">
+                    <span id="Health" class="bg-amber-700 w-full px-2 rounded-md"></span>
+                    <span id="Mana" class="bg-cyan-700 w-full px-2 rounded-md"></span>
+                    <span id="Stamina" class="bg-yellow-700 w-full px-2 rounded-md"></span>
+                </div>
+                <span id="XP" class="bg-yellow-600 w-full px-2 rounded-md text-center"></span>
+            </div>
+            <img id="Character-Portrait" src="/img/portraits/portrait_human_8.webp" alt="Character Portrait"
+                class="aspect-square w-40 h-40 -mt-10 rounded-2xl border-2 border-gray-600">
         </div>
-        <span id="XP" class="bg-yellow-600 w-full px-2 rounded-md text-center"></span>
     </div>
 </div>
 {{end}}

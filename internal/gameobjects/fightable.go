@@ -22,6 +22,7 @@ type Fightable struct {
 	Items          []*Item     `json:"-"`
 	ItemStates     []ItemState `json:"items"`
 	Equipped       []*Item     `json:"-"`
+	Image          string      `json:"image"`
 }
 
 type ItemState struct {

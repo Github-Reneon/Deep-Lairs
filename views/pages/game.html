@@ -1,0 +1,28 @@
+{{ define "game" }}
+<!DOCTYPE html>
+<html lang="en">
+
+{{ template "head" . }}
+
+<body class="bg-green-900 text-white h-screen">
+  <p class="absolute left-0 top-0 p-4 text-sm">Version {{ .Version }}</p>
+  <div class="container mx-auto xl:pt-4 h-full">
+    <div id="content" class="bg-gray-700 p-5 xl:rounded-t-3xl shadow-2xl shadow-black h-full flex flex-col">
+      <h1 class="text-3xl font-bold mb-4 w-full bg-gray-700 flex-none">Deep Lairs</h1>
+      <div id="lairs_container"
+        class="overflow-y-auto flex-1 h-full bg-black m-2 rounded-md p-4 flex flex-col items-end">
+        {{ template "status_bars" . }}
+        <div id="lairs" class="flex flex-col justify-end h-auto">
+        </div>
+      </div>
+      <div id=" input-area" class="mt-4 flex-none">
+        <input type="text" id="lair-input" class="w-full p-2 rounded bg-gray-800 text-white"
+          placeholder="What do you do traveler?">
+      </div>
+    </div>
+  </div>
+  {{ template "script" . }}
+</body>
+
+</html>
+{{ end }}
