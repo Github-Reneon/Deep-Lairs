@@ -1,9 +1,9 @@
 package protocol
 
 type User struct {
-	ID           string   `json:"id"`
-	Username     string   `json:"username"`
-	Password     string   `json:"password"`
-	Email        string   `json:"email"`
-	CharacterIds []string `json:"characters_ids"`
+	ID           string   `gorm:"id"`
+	Username     string   `gorm:"username"`
+	Password     string   `gorm:"password"`
+	Email        string   `gorm:"email"`
+	CharacterIds []string `gorm:"characters_ids"`
 }
