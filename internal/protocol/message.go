@@ -6,6 +6,11 @@ const (
 )
 
 const (
+	CLIENT_VERSION = "0.1.0"
+	SERVER_VERSION = "0.1.0"
+)
+
+const (
 	SERVER_PORT = ":3000"
 	CLIENT_PORT = ":3001"
 )

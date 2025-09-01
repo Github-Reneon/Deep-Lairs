@@ -6,14 +6,14 @@
 
 <body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white antialiased">
   <div class="flex flex-col justify-center items-center">
-    <img src="/img/logo.webp" alt="Deep Lairs Logo" class="mb-4 w-100 h-100">
-    <div class="container flex flex-col items-center">
+    <div class="container flex flex-col items-center mt-12">
       <div
         class="w-full md:mx-4 bg-white dark:bg-gray-800 p-8 rounded shadow border-2 border-gray-500 dark:border-none dark:border-0 shadow-black shadow-lg mb-10">
         <div>
           <h2 class="text-2xl font-bold mb-6 text-center">Create Your Character</h2>
           <form action="/create_character" method="POST" class="space-y-6">
-            <div class="grid grid-cols-1 2xl:grid-cols-3 gap-6">
+            <div
+              class="grid grid-cols-1 2xl:grid-cols-3 gap-6 opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-150">
               <div class="xl:col-span-2 space-y-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-6 mx-auto mb-4">
                   <div>
@@ -150,7 +150,8 @@
                 </div>
               </div>
             </div>
-            <div id="final_stats" class="mb-4 w-full">
+            <div id="final_stats"
+              class="mb-8 w-full opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-300">
               <label for="final_stats" class="block mb-2 text-sm font-medium">Final Character Stats</label>
               <ul class="list-inside grid grid-cols-2 md:grid-cols-3 gap-2">
                 <li><span class="font-bold">Health:</span> <span id="final_health"></span></li>
@@ -170,14 +171,15 @@
                 <li><span class="font-bold">Spell Slots:</span> <span id="final_spellslots"></span></li>
               </ul>
             </div>
-            <div>
+            <div class="opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-450">
               <label for="background" class="block mb-2 text-sm font-medium">Character Background</label>
               <textarea id="background" name="background" rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300 dark:bg-amber-100 dark:text-gray-800"
                 placeholder="What is thy story?"></textarea>
             </div>
             <button type="submit"
-              class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Create
+              class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-600">
+              Create
               Character</button>
           </form>
         </div>

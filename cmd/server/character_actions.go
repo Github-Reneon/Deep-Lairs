@@ -8,22 +8,22 @@ import (
 	"strings"
 )
 
-func UserLaugh(user *gameobjects.User) {
+func CharacterLaugh(user *gameobjects.Character) {
 	user.AddMessage(fmt.Sprintf(protocol.LOL, user.GetName()))
-	for _, u := range user.Location.Users {
+	for _, u := range user.Location.Characters {
 		if u != user {
 			u.AddMessage(fmt.Sprintf(protocol.LOL, user.GetName()))
 		}
 	}
 }
 
-func UserShout(splitMsg []string, user *gameobjects.User) {
+func CharacterShout(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: shout <message>")
 	} else {
 		user.AddMessage(fmt.Sprintf(protocol.SHOUT, user.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
 		// replace later with adding the message to each location
-		for _, u := range user.Location.Users {
+		for _, u := range user.Location.Characters {
 			if u != user {
 				u.AddMessage(fmt.Sprintf(protocol.SHOUT, user.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
 			}
@@ -31,7 +31,7 @@ func UserShout(splitMsg []string, user *gameobjects.User) {
 	}
 }
 
-func UserSay(splitMsg []string, user *gameobjects.User) {
+func CharacterSay(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: say <message>")
 	} else {
@@ -42,7 +42,7 @@ func UserSay(splitMsg []string, user *gameobjects.User) {
 			strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:],
 		)
 		user.AddMessage(message)
-		for _, u := range user.Location.Users {
+		for _, u := range user.Location.Characters {
 			if u != user {
 				u.AddMessage(message)
 			}
@@ -50,7 +50,7 @@ func UserSay(splitMsg []string, user *gameobjects.User) {
 	}
 }
 
-func UserLook(splitMsg []string, user *gameobjects.User) {
+func CharacterLook(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "look "+strings.Join(splitMsg[1:], " ")))
 	} else {
@@ -64,15 +64,15 @@ func UserLook(splitMsg []string, user *gameobjects.User) {
 			}
 		}
 		user.AddMessage(b.String())
-		lookUsers(user)
+		lookCharacters(user)
 	}
 }
 
-func lookUsers(user *gameobjects.User) {
+func lookCharacters(user *gameobjects.Character) {
 	users := []string{}
-	for _, foundUser := range user.Location.Users {
-		if foundUser != user {
-			users = append(users, foundUser.GetName())
+	for _, foundCharacter := range user.Location.Characters {
+		if foundCharacter != user {
+			users = append(users, foundCharacter.GetName())
 		}
 	}
 	if len(users) >= 1 {
@@ -93,7 +93,7 @@ func lookUsers(user *gameobjects.User) {
 	}
 }
 
-func UserQuickLook(splitMsg []string, user *gameobjects.User) {
+func CharacterQuickLook(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "quick_look "+strings.Join(splitMsg[1:], " ")))
 	} else {
@@ -109,10 +109,10 @@ func UserQuickLook(splitMsg []string, user *gameobjects.User) {
 		}
 		user.AddMessage(b.String())
 	}
-	lookUsers(user)
+	lookCharacters(user)
 }
 
-func UserGo(splitMsg []string, user *gameobjects.User) (bool, error) {
+func CharacterGo(splitMsg []string, user *gameobjects.Character) (bool, error) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: go <direction>")
 		return false, fmt.Errorf("no direction provided")
@@ -138,8 +138,8 @@ func UserGo(splitMsg []string, user *gameobjects.User) (bool, error) {
 	}
 	if newLocation, ok := user.Location.JoiningLocations[direction]; ok {
 		knownLocation := user.IsKnownLocation(newLocation)
-		user.Location.RemoveUser(user, direction)
-		newLocation.AddUser(user)
+		user.Location.RemoveCharacter(user, direction)
+		newLocation.AddCharacter(user)
 		user.ChangeLocation(newLocation)
 		user.AddMessage(fmt.Sprintf("You go %s.", direction))
 		user.AddKnownLocation(newLocation)
@@ -150,11 +150,11 @@ func UserGo(splitMsg []string, user *gameobjects.User) (bool, error) {
 	}
 }
 
-func UserWhere(splitMsg []string, user *gameobjects.User) {
+func CharacterWhere(splitMsg []string, user *gameobjects.Character) {
 	user.AddMessage(fmt.Sprintf("You are in %s<br>%s", user.Location.Name, user.Location.Description))
 }
 
-func UserSearch(splitMsg []string, user *gameobjects.User) {
+func CharacterSearch(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "search "+strings.Join(splitMsg[1:], " ")))
 	} else {
@@ -162,13 +162,13 @@ func UserSearch(splitMsg []string, user *gameobjects.User) {
 	}
 }
 
-func UserJoin(user *gameobjects.User) {
-	UserWhere([]string{"w"}, user)
+func CharacterJoin(user *gameobjects.Character) {
+	CharacterWhere([]string{"w"}, user)
 	user.AddMessage(fmt.Sprintf(protocol.IMAGE, user.Location.LocationImage))
-	UserQuickLook([]string{"l"}, user)
+	CharacterQuickLook([]string{"l"}, user)
 }
 
-func UserQuestBoard(splitMsg []string, user *gameobjects.User) {
+func CharacterQuestBoard(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) > 1 {
 		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "questboard "+strings.Join(splitMsg[1:], " ")))
 	} else {
@@ -188,11 +188,11 @@ func UserQuestBoard(splitMsg []string, user *gameobjects.User) {
 }
 
 // TODO
-func SendUserState(user *gameobjects.User) {
+func SendCharacterState(user *gameobjects.Character) {
 	user.AddMessage(user.GetState())
 }
 
-func UserInventory(user *gameobjects.User) {
+func CharacterInventory(user *gameobjects.Character) {
 	if len(user.Items) == 0 {
 		user.AddMessage("Your inventory is empty.")
 	} else {
@@ -210,7 +210,7 @@ func UserInventory(user *gameobjects.User) {
 	}
 }
 
-func UserEquip(splitMsg []string, user *gameobjects.User) {
+func CharacterEquip(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: equip <item>")
 		return
@@ -234,7 +234,7 @@ func UserEquip(splitMsg []string, user *gameobjects.User) {
 	user.EquipItem(item)
 }
 
-func findItem(user *gameobjects.User, itemName string) (*gameobjects.Item, bool) {
+func findItem(user *gameobjects.Character, itemName string) (*gameobjects.Item, bool) {
 	var item *gameobjects.Item
 	for _, i := range user.Items {
 		if i.Name == itemName {
@@ -257,7 +257,7 @@ func findItem(user *gameobjects.User, itemName string) (*gameobjects.Item, bool)
 	return item, false
 }
 
-func UserUnequip(splitMsg []string, user *gameobjects.User) {
+func CharacterUnequip(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: unequip <item>")
 		return
@@ -274,7 +274,7 @@ func UserUnequip(splitMsg []string, user *gameobjects.User) {
 	user.UnequipItem(item)
 }
 
-func UserDo(splitMsg []string, user *gameobjects.User) {
+func CharacterDo(splitMsg []string, user *gameobjects.Character) {
 	if len(splitMsg) < 2 {
 		user.AddMessage("Usage: do <action>")
 		return

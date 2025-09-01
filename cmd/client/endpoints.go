@@ -65,3 +65,11 @@ func GetCharacterCreation(c *fiber.Ctx) error {
 		"Version": "0.1.0",
 	})
 }
+
+func GetCharacterSelect(c *fiber.Ctx) error {
+	// set content type to html
+	c.Set("Content-Type", "text/html")
+	return c.Render("character_select", fiber.Map{
+		"Version": protocol.CLIENT_VERSION,
+	})
+}

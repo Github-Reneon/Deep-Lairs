@@ -7,8 +7,8 @@ import (
 )
 
 type World struct {
-	Places       map[string]*Place
-	CurrentUsers int
+	Places            map[string]*Place
+	CurrentCharacters int
 }
 
 func (w *World) AddShout(msg string) {
@@ -17,9 +17,9 @@ func (w *World) AddShout(msg string) {
 	}
 }
 
-func GetUser(world *World, id string) *User {
+func GetCharacter(world *World, id string) *Character {
 	for _, place := range world.Places {
-		if user, ok := place.Users[id]; ok {
+		if user, ok := place.Characters[id]; ok {
 			return user
 		}
 	}

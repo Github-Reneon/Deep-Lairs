@@ -27,7 +27,8 @@ func main() {
 
 	app := fiber.New(
 		fiber.Config{
-			Views: engine,
+			Views:        engine,
+			ErrorHandler: ErrorHandler,
 		},
 	)
 
@@ -48,12 +49,15 @@ func main() {
 		return c.Next()
 	})
 
-	app.Get("/character_creation", GetCharacterCreation)
 	app.Get("/", GetIndex)
-	app.Get("/game", GetGame)
 	app.Get("/login", GetLogin)
 	app.Post("/login", PostLogin)
 	app.Get("/signup", GetSignup)
+
+	game := app.Group("/app")
+	game.Use(AuthRequired)
+	game.Get("/game", GetGame)
+	game.Get("/character_creation", GetCharacterCreation)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)

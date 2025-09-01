@@ -10,31 +10,31 @@ import (
 var placeLocks sync.Map
 
 type Place struct {
-	ID                    string            `json:"id"`
-	Name                  string            `json:"name"`
-	Description           string            `json:"description"`
-	Users                 map[string]*User  `json:"-"`
-	Look                  string            `json:"look"`
-	TitleLook             string            `json:"title_look"`
-	LookImage             string            `json:"look_image"`
-	LocationImage         string            `json:"location_image"`
-	Messages              []string          `json:"-"`
-	Jingles               []string          `json:"jingles"`
-	JoiningLocations      map[string]*Place `json:"-"`
-	JoiningLocationIds    map[string]string `json:"joining_location_ids"`
-	JoiningMessage        string            `json:"joining_message"`
-	LeavingMessage        string            `json:"leaving_message"`
-	Quests                []Quest           `json:"quests,omitempty"`
-	HiddenLocationMessage string            `json:"hidden_location_message,omitempty"`
+	ID                    string                `json:"id"`
+	Name                  string                `json:"name"`
+	Description           string                `json:"description"`
+	Characters            map[string]*Character `json:"-"`
+	Look                  string                `json:"look"`
+	TitleLook             string                `json:"title_look"`
+	LookImage             string                `json:"look_image"`
+	LocationImage         string                `json:"location_image"`
+	Messages              []string              `json:"-"`
+	Jingles               []string              `json:"jingles"`
+	JoiningLocations      map[string]*Place     `json:"-"`
+	JoiningLocationIds    map[string]string     `json:"joining_location_ids"`
+	JoiningMessage        string                `json:"joining_message"`
+	LeavingMessage        string                `json:"leaving_message"`
+	Quests                []Quest               `json:"quests,omitempty"`
+	HiddenLocationMessage string                `json:"hidden_location_message,omitempty"`
 }
 
-func (p *Place) AddUserMessage(msg string, user *User) {
+func (p *Place) AddCharacterMessage(msg string, character *Character) {
 	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	for _, u := range p.Users {
-		if u != user {
+	for _, u := range p.Characters {
+		if u != character {
 			u.AddMessage(msg)
 		}
 	}
@@ -70,23 +70,23 @@ func (p *Place) RemoveMessage(msg string) {
 	p.Messages = p.Messages[1:]
 }
 
-func (p *Place) RemoveUser(user *User, direction string) {
-	defer p.AddUserMessage(fmt.Sprintf(p.LeavingMessage, user.GetName(), direction), user)
+func (p *Place) RemoveCharacter(character *Character, direction string) {
+	defer p.AddCharacterMessage(fmt.Sprintf(p.LeavingMessage, character.GetName(), direction), character)
 	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
 
-	delete(p.Users, user.ID)
+	delete(p.Characters, character.ID)
 }
 
-func (p *Place) AddUser(user *User) {
-	defer p.AddUserMessage(fmt.Sprintf(p.JoiningMessage, user.GetName()), user)
+func (p *Place) AddCharacter(character *Character) {
+	defer p.AddCharacterMessage(fmt.Sprintf(p.JoiningMessage, character.GetName()), character)
 	muInterface, _ := placeLocks.LoadOrStore(p.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	p.Users[user.ID] = user
+	p.Characters[character.ID] = character
 }
 
 func (p *Place) StartMessageHandler() {
@@ -96,7 +96,7 @@ func (p *Place) StartMessageHandler() {
 			log.Println("Sending messages to users in place:", p.Name)
 			for _, message := range p.Messages {
 				// Send the message to all users in the place
-				for _, user := range p.Users {
+				for _, user := range p.Characters {
 					user.AddMessage(message)
 				}
 				p.RemoveMessage(message)
@@ -105,13 +105,13 @@ func (p *Place) StartMessageHandler() {
 	}
 }
 
-func (p *Place) StartCheckUsersHandler() {
+func (p *Place) StartCheckCharactersHandler() {
 	for {
 		time.Sleep(time.Second * 5)
-		if len(p.Users) > 0 {
-			for _, user := range p.Users {
+		if len(p.Characters) > 0 {
+			for _, user := range p.Characters {
 				if user.Location != p {
-					p.RemoveUser(user, "poof")
+					p.RemoveCharacter(user, "poof")
 					p.AddMessage(fmt.Sprintf("User %s has been removed from %s.", user.Name, p.Name))
 				}
 			}
@@ -121,7 +121,7 @@ func (p *Place) StartCheckUsersHandler() {
 
 func (p *Place) Init(world *World) {
 	p.JoiningLocations = make(map[string]*Place)
-	p.Users = make(map[string]*User)
+	p.Characters = make(map[string]*Character)
 	for dir, loc := range p.JoiningLocationIds {
 		log.Println("Initializing joining location:", dir, loc)
 		log.Println(world.Places[loc].ID, world.Places[loc].Name)
