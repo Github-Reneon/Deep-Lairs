@@ -15,9 +15,11 @@ func GetGame(c *fiber.Ctx) error {
 		WebSocketURL = protocol.PROD_WS_LINK
 	}
 
-	if c.Cookies("character_id", protocol.USER_NOT_FOUND) == protocol.USER_NOT_FOUND {
-		return c.Redirect("/app/character_select")
-	}
+	/*
+		if c.Cookies("character_id", protocol.USER_NOT_FOUND) == protocol.USER_NOT_FOUND {
+			return c.Redirect("/app/character_select")
+		}
+	*/
 
 	return c.Render("game", fiber.Map{
 		"Version":      protocol.CLIENT_VERSION,
@@ -58,10 +60,8 @@ func PostLogin(c *fiber.Ctx) error {
 			"error": "Invalid request body",
 		})
 	}
-	c.Set("Content-Type", "application/json")
-	return c.JSON(fiber.Map{
-		"status": "success",
-	})
+
+	return c.Redirect("/app/character_select")
 }
 
 func GetCharacterCreation(c *fiber.Ctx) error {
@@ -76,30 +76,7 @@ func GetCharacterSelect(c *fiber.Ctx) error {
 	// set content type to html
 	c.Set("Content-Type", "text/html")
 	return c.Render("character_select", fiber.Map{
-		"Version": protocol.CLIENT_VERSION,
-		"Characters": []gameobjects.Character{
-			{
-				ID:   "char1",
-				Name: "Hero123",
-				UserFightable: gameobjects.UserFightable{
-					Level: 1,
-					Class: "Mage",
-					Fightable: gameobjects.Fightable{
-						Image: "portrait_elf_8.webp",
-					},
-				},
-			},
-			{
-				ID:   "char2",
-				Name: "Warrior456",
-				UserFightable: gameobjects.UserFightable{
-					Class: "Warrior",
-					Level: 5,
-					Fightable: gameobjects.Fightable{
-						Image: "portrait_dwarf_1.webp",
-					},
-				},
-			},
-		},
+		"Version":    protocol.CLIENT_VERSION,
+		"Characters": []gameobjects.Character{},
 	})
 }

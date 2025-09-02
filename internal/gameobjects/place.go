@@ -77,7 +77,7 @@ func (p *Place) RemoveCharacter(character *Character, direction string) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	delete(p.Characters, character.ID)
+	delete(p.Characters, fmt.Sprint(character.ID))
 }
 
 func (p *Place) AddCharacter(character *Character) {
@@ -86,7 +86,7 @@ func (p *Place) AddCharacter(character *Character) {
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	p.Characters[character.ID] = character
+	p.Characters[fmt.Sprint(character.ID)] = character
 }
 
 func (p *Place) StartMessageHandler() {

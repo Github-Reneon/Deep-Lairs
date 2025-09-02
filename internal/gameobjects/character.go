@@ -10,24 +10,25 @@ import (
 	"slices"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-var userLocks sync.Map
+var characterLocks sync.Map
 
 type Character struct {
-	ID               string      `json:"id"`
-	Name             string      `json:"name"`
-	LastName         string      `json:"last_name"`
-	Location         *Place      `json:"-"`
-	LocationId       string      `json:"location"`
-	MessageQueue     []string    `json:"-"`
-	Looked           bool        `json:"-"`
-	KnownLocations   []*Place    `json:"-"`
-	KnownLocationIds []string    `json:"known_locations"`
-	Busy             bool        `json:"-"`
-	changed          bool        `json:"-"`
-	fighting         *IFightable `json:"-"`
-	UserFightable
+	ID             uuid.UUID   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	Name           string      `gorm:"size:255"`
+	LastName       string      `gorm:"size:255"`
+	Location       *Place      `gorm:"-"`
+	KnownLocations []*Place    `gorm:"-"`
+	LocationId     string      `gorm:"index"`
+	MessageQueue   []string    `gorm:"-"`
+	Looked         bool        `gorm:"-"`
+	Busy           bool        `gorm:"-"`
+	changed        bool        `gorm:"-"`
+	fighting       *IFightable `gorm:"-"`
+	CharacterFightable
 }
 
 type IFightable interface {
@@ -35,23 +36,24 @@ type IFightable interface {
 	BeDamaged(damage int) int
 }
 
-type UserFightable struct {
-	XP    int    `json:"xp"`
-	MaxXP int    `json:"max_xp"`
-	Level int    `json:"level"`
-	Class string `json:"class"`
+type CharacterFightable struct {
+	XP    int
+	MaxXP int
+	Level int
+	Class string
 	Fightable
 }
 
 func (c *Character) GetName() string {
 	if c.Name == "" {
-		return c.ID
+		// int to string
+		return fmt.Sprintf("%d", c.ID)
 	}
 	return c.Name
 }
 
 func (c *Character) AddMessage(msg string) {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -59,7 +61,7 @@ func (c *Character) AddMessage(msg string) {
 }
 
 func (c *Character) ClearLastMessage() {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -70,7 +72,7 @@ func (c *Character) ClearLastMessage() {
 
 func (c *Character) ChangeLocation(newLocation *Place) {
 	if !c.Busy {
-		muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+		muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 		mu := muInterface.(*sync.Mutex)
 		mu.Lock()
 		defer mu.Unlock()
@@ -82,7 +84,7 @@ func (c *Character) ChangeLocation(newLocation *Place) {
 }
 
 func (c *Character) AddKnownLocation(location *Place) {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -93,7 +95,7 @@ func (c *Character) AddKnownLocation(location *Place) {
 }
 
 func (c *Character) IsKnownLocation(location *Place) bool {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -107,7 +109,7 @@ func (c *Character) IsKnownLocation(location *Place) bool {
 }
 
 func (c *Character) GetState() string {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -133,7 +135,7 @@ func (c *Character) GetState() string {
 }
 
 func (c *Character) SetBusyState(busy bool) {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
@@ -171,30 +173,42 @@ func (c *Character) Search() {
 	}
 }
 
-func (c *Character) EquipItem(item *Item) {
+func (c *Character) EquipItem(itemState *ItemState) {
 	// lock
-	defer c.AddMessage(fmt.Sprintf("You equip the %s.", item.Name))
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	c.changed = true
-	c.Equipped = append(c.Equipped, item)
-}
-
-func (c *Character) UnequipItem(item *Item) {
-	// lock
-	defer c.AddMessage(fmt.Sprintf("You unequip the %s.", item.Name))
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
-	mu := muInterface.(*sync.Mutex)
-	mu.Lock()
-	defer mu.Unlock()
-	for i, equippedItem := range c.Equipped {
-		if equippedItem == item {
-			c.Equipped = append(c.Equipped[:i], c.Equipped[i+1:]...)
-			c.changed = true
+	if itemState.Equipped {
+		c.AddMessage("You are already wearing that item.")
+		return
+	}
+	for _, ItemState := range c.ItemStates {
+		if !ItemState.Equipped {
+			continue
+		}
+		equippedItem := ItemState.Item
+		if equippedItem.Slot == itemState.Slot {
+			c.AddMessage(fmt.Sprintf("You are already wearing the following item: %s, which is in the same item slot.", equippedItem.Name))
 			return
 		}
+	}
+	itemState.Equipped = true
+	c.changed = true
+	c.AddMessage(fmt.Sprintf("You equip the %s.", itemState.Item.Name))
+}
+
+func (c *Character) UnequipItem(itemState *ItemState) {
+	// lock
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	mu := muInterface.(*sync.Mutex)
+	mu.Lock()
+	defer mu.Unlock()
+	if itemState.Equipped {
+		itemState.Equipped = false
+		c.changed = true
+		c.AddMessage(fmt.Sprintf("You unequip the %s.", itemState.Item.Name))
+		return
 	}
 	c.AddMessage("You are not wearing that item.")
 }
@@ -210,7 +224,11 @@ func (c *Character) StartCalcStatsHandler() {
 			c.Stamina = c.BaseMaxStamina
 			c.Attack = c.BaseAttack
 			c.Defense = c.BaseDefense
-			for _, equippedItem := range c.Equipped {
+			for _, ItemState := range c.ItemStates {
+				if !ItemState.Equipped {
+					continue
+				}
+				equippedItem := ItemState.Item
 				switch equippedItem.BonusType {
 				case BONUS_TYPE_ATTACK:
 					c.Attack = c.BaseAttack + equippedItem.BonusAmount
@@ -230,48 +248,20 @@ func (c *Character) StartCalcStatsHandler() {
 
 func (c *Character) Init(health, attack, defense, mana, stamina, speed, intelligence int) {
 	// lock
-	defer c.SetIds()
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.ID, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
-	c.UserFightable.InitFightable(health, attack, defense, mana, stamina, speed, intelligence)
+	c.CharacterFightable.InitFightable(health, attack, defense, mana, stamina, speed, intelligence)
 	c.XP = 0
 	c.MaxXP = 100
 	c.Level = 1
 	c.Image = "portrait_human_8.webp"
 }
 
-// SetIds assigns unique IDs to the user and their items.
-func (c *Character) SetIds() {
-	muInterface, _ := userLocks.LoadOrStore(c.ID, &sync.Mutex{})
-	mu := muInterface.(*sync.Mutex)
-	mu.Lock()
-	defer mu.Unlock()
-	c.KnownLocationIds = make([]string, len(c.KnownLocations))
-	for i, location := range c.KnownLocations {
-		c.KnownLocationIds[i] = location.ID
-	}
-	c.ItemStates = make([]ItemState, len(c.Items))
-	for i, item := range c.Items {
-		c.ItemStates[i] = ItemState{
-			ItemId:   item.Id,
-			Equipped: slices.Contains(c.Equipped, item),
-		}
-	}
-}
-
-func (c *Character) StartSetIdsHandler() {
-	// Start a goroutine to set IDs
-	for {
-		time.Sleep(time.Second)
-		c.SetIds()
-	}
-}
-
 func (c *Character) Save() {
 	// lock
-	muInterface, _ := userLocks.LoadOrStore(c.Name, &sync.Mutex{})
+	muInterface, _ := characterLocks.LoadOrStore(c.Name, &sync.Mutex{})
 	mu := muInterface.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()

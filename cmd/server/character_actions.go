@@ -8,113 +8,113 @@ import (
 	"strings"
 )
 
-func CharacterLaugh(user *gameobjects.Character) {
-	user.AddMessage(fmt.Sprintf(protocol.LOL, user.GetName()))
-	for _, u := range user.Location.Characters {
-		if u != user {
-			u.AddMessage(fmt.Sprintf(protocol.LOL, user.GetName()))
+func CharacterLaugh(character *gameobjects.Character) {
+	character.AddMessage(fmt.Sprintf(protocol.LOL, character.GetName()))
+	for _, u := range character.Location.Characters {
+		if u != character {
+			u.AddMessage(fmt.Sprintf(protocol.LOL, character.GetName()))
 		}
 	}
 }
 
-func CharacterShout(splitMsg []string, user *gameobjects.Character) {
+func CharacterShout(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: shout <message>")
+		character.AddMessage("Usage: shout <message>")
 	} else {
-		user.AddMessage(fmt.Sprintf(protocol.SHOUT, user.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
+		character.AddMessage(fmt.Sprintf(protocol.SHOUT, character.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
 		// replace later with adding the message to each location
-		for _, u := range user.Location.Characters {
-			if u != user {
-				u.AddMessage(fmt.Sprintf(protocol.SHOUT, user.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
+		for _, u := range character.Location.Characters {
+			if u != character {
+				u.AddMessage(fmt.Sprintf(protocol.SHOUT, character.GetName(), strings.ToUpper(strings.Join(splitMsg[1:], " "))))
 			}
 		}
 	}
 }
 
-func CharacterSay(splitMsg []string, user *gameobjects.Character) {
+func CharacterSay(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: say <message>")
+		character.AddMessage("Usage: say <message>")
 	} else {
 		message := fmt.Sprintf(
 			protocol.SAY,
-			"/img/portraits/"+user.Image,
-			user.GetName(),
+			"/img/portraits/"+character.Image,
+			character.GetName(),
 			strings.ToUpper(splitMsg[1][:1])+strings.Join(splitMsg[1:], " ")[1:],
 		)
-		user.AddMessage(message)
-		for _, u := range user.Location.Characters {
-			if u != user {
+		character.AddMessage(message)
+		for _, u := range character.Location.Characters {
+			if u != character {
 				u.AddMessage(message)
 			}
 		}
 	}
 }
 
-func CharacterLook(splitMsg []string, user *gameobjects.Character) {
+func CharacterLook(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) > 1 {
-		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "look "+strings.Join(splitMsg[1:], " ")))
+		character.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "look "+strings.Join(splitMsg[1:], " ")))
 	} else {
 		b := strings.Builder{}
-		b.WriteString(fmt.Sprintf(protocol.LOOK, user.Location.TitleLook, user.Location.Look, user.Location.LookImage))
-		if len(user.Location.JoiningLocations) > 0 {
-			for direction, place := range user.Location.JoiningLocations {
-				if slices.Contains(user.KnownLocations, place) && place.HiddenLocationMessage != "" {
+		b.WriteString(fmt.Sprintf(protocol.LOOK, character.Location.TitleLook, character.Location.Look, character.Location.LookImage))
+		if len(character.Location.JoiningLocations) > 0 {
+			for direction, place := range character.Location.JoiningLocations {
+				if slices.Contains(character.KnownLocations, place) && place.HiddenLocationMessage != "" {
 					b.WriteString(fmt.Sprintf(place.HiddenLocationMessage, direction))
 				}
 			}
 		}
-		user.AddMessage(b.String())
-		lookCharacters(user)
+		character.AddMessage(b.String())
+		lookCharacters(character)
 	}
 }
 
-func lookCharacters(user *gameobjects.Character) {
-	users := []string{}
-	for _, foundCharacter := range user.Location.Characters {
-		if foundCharacter != user {
-			users = append(users, foundCharacter.GetName())
+func lookCharacters(character *gameobjects.Character) {
+	characters := []string{}
+	for _, foundCharacter := range character.Location.Characters {
+		if foundCharacter != character {
+			characters = append(characters, foundCharacter.GetName())
 		}
 	}
-	if len(users) >= 1 {
-		if len(users) >= 10 {
-			user.AddMessage(fmt.Sprintf("You see many adventurers here. %d in total.", len(users)))
+	if len(characters) >= 1 {
+		if len(characters) >= 10 {
+			character.AddMessage(fmt.Sprintf("You see many adventurers here. %d in total.", len(characters)))
 		} else {
 			b := strings.Builder{}
 			b.WriteString("You see the following adventurers here:<br class=\"my-2\">")
 			b.WriteString("<span class=\"inline-grid grid-cols-5 gap-4\">")
-			for _, u := range users {
+			for _, u := range characters {
 				b.WriteString(fmt.Sprintf("<span class=\"p-2\">%s</span>", u))
 			}
 			b.WriteString("</span>")
-			user.AddMessage(b.String())
+			character.AddMessage(b.String())
 		}
 	} else {
-		user.AddMessage("You don't see any other adventurers here.")
+		character.AddMessage("You don't see any other adventurers here.")
 	}
 }
 
-func CharacterQuickLook(splitMsg []string, user *gameobjects.Character) {
+func CharacterQuickLook(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) > 1 {
-		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "quick_look "+strings.Join(splitMsg[1:], " ")))
+		character.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "quick_look "+strings.Join(splitMsg[1:], " ")))
 	} else {
 		b := strings.Builder{}
-		b.WriteString(fmt.Sprintf(protocol.LOOK_NO_IMAGE, user.Location.TitleLook, user.Location.Look))
+		b.WriteString(fmt.Sprintf(protocol.LOOK_NO_IMAGE, character.Location.TitleLook, character.Location.Look))
 		b.WriteString(" ")
-		if len(user.Location.JoiningLocations) > 0 {
-			for direction, place := range user.Location.JoiningLocations {
-				if slices.Contains(user.KnownLocations, place) && place.HiddenLocationMessage != "" {
+		if len(character.Location.JoiningLocations) > 0 {
+			for direction, place := range character.Location.JoiningLocations {
+				if slices.Contains(character.KnownLocations, place) && place.HiddenLocationMessage != "" {
 					b.WriteString(fmt.Sprintf(place.HiddenLocationMessage, direction))
 				}
 			}
 		}
-		user.AddMessage(b.String())
+		character.AddMessage(b.String())
 	}
-	lookCharacters(user)
+	lookCharacters(character)
 }
 
-func CharacterGo(splitMsg []string, user *gameobjects.Character) (bool, error) {
+func CharacterGo(splitMsg []string, character *gameobjects.Character) (bool, error) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: go <direction>")
+		character.AddMessage("Usage: go <direction>")
 		return false, fmt.Errorf("no direction provided")
 	}
 	direction := strings.ToLower(splitMsg[1])
@@ -136,149 +136,155 @@ func CharacterGo(splitMsg []string, user *gameobjects.Character) (bool, error) {
 	case "o":
 		direction = "out"
 	}
-	if newLocation, ok := user.Location.JoiningLocations[direction]; ok {
-		knownLocation := user.IsKnownLocation(newLocation)
-		user.Location.RemoveCharacter(user, direction)
-		newLocation.AddCharacter(user)
-		user.ChangeLocation(newLocation)
-		user.AddMessage(fmt.Sprintf("You go %s.", direction))
-		user.AddKnownLocation(newLocation)
+	if newLocation, ok := character.Location.JoiningLocations[direction]; ok {
+		knownLocation := character.IsKnownLocation(newLocation)
+		character.Location.RemoveCharacter(character, direction)
+		newLocation.AddCharacter(character)
+		character.ChangeLocation(newLocation)
+		character.AddMessage(fmt.Sprintf("You go %s.", direction))
+		character.AddKnownLocation(newLocation)
 		return knownLocation, nil
 	} else {
-		user.AddMessage(fmt.Sprintf("You can't go %s.", direction))
+		character.AddMessage(fmt.Sprintf("You can't go %s.", direction))
 		return false, fmt.Errorf("no location in direction: %s", direction)
 	}
 }
 
-func CharacterWhere(splitMsg []string, user *gameobjects.Character) {
-	user.AddMessage(fmt.Sprintf("You are in %s<br>%s", user.Location.Name, user.Location.Description))
+func CharacterWhere(splitMsg []string, character *gameobjects.Character) {
+	character.AddMessage(fmt.Sprintf("You are in %s<br>%s", character.Location.Name, character.Location.Description))
 }
 
-func CharacterSearch(splitMsg []string, user *gameobjects.Character) {
+func CharacterSearch(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) > 1 {
-		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "search "+strings.Join(splitMsg[1:], " ")))
+		character.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "search "+strings.Join(splitMsg[1:], " ")))
 	} else {
-		go user.Search()
+		go character.Search()
 	}
 }
 
-func CharacterJoin(user *gameobjects.Character) {
-	CharacterWhere([]string{"w"}, user)
-	user.AddMessage(fmt.Sprintf(protocol.IMAGE, user.Location.LocationImage))
-	CharacterQuickLook([]string{"l"}, user)
+func CharacterJoin(character *gameobjects.Character) {
+	CharacterWhere([]string{"w"}, character)
+	character.AddMessage(fmt.Sprintf(protocol.IMAGE, character.Location.LocationImage))
+	CharacterQuickLook([]string{"l"}, character)
 }
 
-func CharacterQuestBoard(splitMsg []string, user *gameobjects.Character) {
+func CharacterQuestBoard(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) > 1 {
-		user.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "questboard "+strings.Join(splitMsg[1:], " ")))
+		character.AddMessage(fmt.Sprintf(protocol.I_DONT_KNOW_HOW_TO, "questboard "+strings.Join(splitMsg[1:], " ")))
 	} else {
-		if len(user.Location.Quests) == 0 {
-			user.AddMessage("There is no quest board here.")
+		if len(character.Location.Quests) == 0 {
+			character.AddMessage("There is no quest board here.")
 		} else {
 			b := strings.Builder{}
 			b.WriteString("You see a quest board with the following quests:<br><span class=\"inline-grid grid-cols-5 gap-4\">")
 			// List available quests
-			for a, quest := range user.Location.Quests {
+			for a, quest := range character.Location.Quests {
 				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-gray-900 rounded-lg\">%s (%d)</span>", quest.Name, a+1))
 			}
 			b.WriteString("</span>")
-			user.AddMessage(b.String())
+			character.AddMessage(b.String())
 		}
 	}
 }
 
 // TODO
-func SendCharacterState(user *gameobjects.Character) {
-	user.AddMessage(user.GetState())
+func SendCharacterState(character *gameobjects.Character) {
+	character.AddMessage(character.GetState())
 }
 
-func CharacterInventory(user *gameobjects.Character) {
-	if len(user.Items) == 0 {
-		user.AddMessage("Your inventory is empty.")
+func CharacterInventory(character *gameobjects.Character) {
+	if len(character.ItemStates) == 0 {
+		character.AddMessage("Your inventory is empty.")
 	} else {
 		b := strings.Builder{}
 		b.WriteString("You have the following items in your inventory:<br><span class=\"inline-grid grid-cols-5 gap-4\">")
-		for _, item := range user.Items {
-			if slices.Contains(user.Equipped, item) {
-				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-green-700 rounded-lg\">%s (equipped)</span>", item.Name))
+		for _, ItemState := range character.ItemStates {
+			if ItemState.Equipped {
+				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-green-700 rounded-lg\">%s (equipped)</span>", ItemState.Item.Name))
 			} else {
-				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-gray-900 rounded-lg\">%s</span>", item.Name))
+				b.WriteString(fmt.Sprintf("<span class=\"p-2 bg-gray-900 rounded-lg\">%s</span>", ItemState.Item.Name))
 			}
 		}
 		b.WriteString("</span>")
-		user.AddMessage(b.String())
+		character.AddMessage(b.String())
 	}
 }
 
-func CharacterEquip(splitMsg []string, user *gameobjects.Character) {
+func CharacterEquip(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: equip <item>")
+		character.AddMessage("Usage: equip <item>")
 		return
 	}
 	itemName := strings.Join(splitMsg[1:], " ")
-	item, notFound := findItem(user, itemName)
+	itemState, notFound := findItemState(character, itemName)
 	if notFound {
-		user.AddMessage("Item not found.")
+		character.AddMessage("Item not found.")
 		return
 	}
-	if slices.Contains(user.Equipped, item) {
-		user.AddMessage("You are already wearing that item.")
+	if itemState.Equipped {
+		character.AddMessage("You are already wearing that item.")
 		return
 	}
-	for _, equippedItem := range user.Equipped {
-		if equippedItem.Slot == item.Slot {
-			user.AddMessage(fmt.Sprintf("You are already wearing the following item: %s, which is in the same item slot.", equippedItem.Name))
+	for _, characterItemState := range character.ItemStates {
+		if !characterItemState.Equipped {
+			continue
+		}
+		equippedItem := characterItemState.Item
+		if equippedItem.Slot == itemState.Slot {
+			character.AddMessage(fmt.Sprintf("You are already wearing the following item: %s, which is in the same item slot.", equippedItem.Name))
 			return
 		}
 	}
-	user.EquipItem(item)
+	character.EquipItem(itemState)
 }
 
-func findItem(user *gameobjects.Character, itemName string) (*gameobjects.Item, bool) {
-	var item *gameobjects.Item
-	for _, i := range user.Items {
-		if i.Name == itemName {
-			item = i
+func findItemState(character *gameobjects.Character, itemName string) (*gameobjects.ItemState, bool) {
+	var foundItemState *gameobjects.ItemState
+	for _, ItemState := range character.ItemStates {
+		if ItemState.Item.Name == itemName {
+			foundItemState = &ItemState
 			break
 		}
 	}
-	if item == nil {
+	if foundItemState == nil {
 		// search tags
-		for _, i := range user.Items {
-			if slices.Contains(i.Tags, itemName) {
-				item = i
-				break
+		for _, ItemState := range character.ItemStates {
+			for _, tag := range ItemState.Item.Tags {
+				if tag.Name == itemName {
+					foundItemState = &ItemState
+					break
+				}
 			}
 		}
 	}
-	if item == nil {
+	if foundItemState == nil {
 		return nil, true
 	}
-	return item, false
+	return foundItemState, false
 }
 
-func CharacterUnequip(splitMsg []string, user *gameobjects.Character) {
+func CharacterUnequip(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: unequip <item>")
+		character.AddMessage("Usage: unequip <item>")
 		return
 	}
 	itemName := strings.Join(splitMsg[1:], " ")
-	item, shouldReturn := findItem(user, itemName)
+	itemState, shouldReturn := findItemState(character, itemName)
 	if shouldReturn {
 		return
 	}
-	if !slices.Contains(user.Equipped, item) {
-		user.AddMessage("You are not wearing that item.")
+	if !itemState.Equipped {
+		character.AddMessage("You are not wearing that item.")
 		return
 	}
-	user.UnequipItem(item)
+	character.UnequipItem(itemState)
 }
 
-func CharacterDo(splitMsg []string, user *gameobjects.Character) {
+func CharacterDo(splitMsg []string, character *gameobjects.Character) {
 	if len(splitMsg) < 2 {
-		user.AddMessage("Usage: do <action>")
+		character.AddMessage("Usage: do <action>")
 		return
 	}
 	actionName := strings.Join(splitMsg[1:], " ")
-	user.Location.AddMessage(fmt.Sprintf(protocol.DO, user.GetName(), actionName))
+	character.Location.AddMessage(fmt.Sprintf(protocol.DO, character.GetName(), actionName))
 }

@@ -38,6 +38,23 @@ func main() {
 		Download: false,
 	})
 
+	setDboObjects()
+	setCORS(app)
+	setUpRoutes(app)
+
+	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
+		fmt.Println("Error starting server:", err)
+	}
+}
+
+func setDboObjects() {
+	// initialize database connection
+	initDBO()
+	// create tables if they don't exist
+	createTables()
+}
+
+func setCORS(app *fiber.App) {
 	// cors allow all origins
 	app.Use(func(c *fiber.Ctx) error {
 		c.Set("Access-Control-Allow-Origin", "*")
@@ -48,6 +65,9 @@ func main() {
 		}
 		return c.Next()
 	})
+}
+
+func setUpRoutes(app *fiber.App) {
 
 	app.Get("/", GetIndex)
 	app.Get("/index", GetIndex)
@@ -69,7 +89,4 @@ func main() {
 	game.Get("/character_creation", GetCharacterCreation)
 	game.Get("/character_select", GetCharacterSelect)
 
-	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
-		fmt.Println("Error starting server:", err)
-	}
 }

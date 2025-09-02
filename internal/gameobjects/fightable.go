@@ -19,15 +19,15 @@ type Fightable struct {
 	Int            int         `json:"-"`
 	BaseInt        int         `json:"intelligence"`
 	InCombat       bool        `json:"-"`
-	Items          []*Item     `json:"-"`
-	ItemStates     []ItemState `json:"items"`
-	Equipped       []*Item     `json:"-"`
+	ItemStates     []ItemState `json:"item_states" gorm:"foreignKey:FightableID;constraint:onDelete:CASCADE,onUpdate:CASCADE"`
 	Image          string      `json:"image"`
 }
 
 type ItemState struct {
-	ItemId   string `json:"item_id"`
-	Equipped bool   `json:"equipped"`
+	Item     *Item `gorm:"foreignKey:ItemID;constraint:onDelete:CASCADE,onUpdate:CASCADE"`
+	ItemID   uint
+	Slot     int
+	Equipped bool
 }
 
 func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed, intelligence int) {
@@ -49,9 +49,16 @@ func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed,
 	f.BaseSpeed = speed
 	f.Int = intelligence
 	f.BaseInt = intelligence
-	f.Items = []*Item{
-		CreateTestRingOfHealth(),
-		CreateTestRingOfMana(),
+	f.ItemStates = []ItemState{
+		ItemState{
+			Item:     CreateTestRingOfHealth(),
+			Slot:     SLOT_RING,
+			Equipped: false,
+		},
+		ItemState{
+			Item:     CreateTestRingOfMana(),
+			Slot:     SLOT_RING,
+			Equipped: false,
+		},
 	}
-	f.Equipped = []*Item{}
 }

@@ -1,6 +1,8 @@
 package gameobjects
 
-import "github.com/google/uuid"
+import (
+	"gorm.io/gorm"
+)
 
 const (
 	BONUS_TYPE_HEALTH = iota
@@ -22,7 +24,7 @@ const (
 )
 
 type Item struct {
-	Id          string
+	gorm.Model
 	Name        string
 	Description string
 	Weight      int
@@ -31,12 +33,16 @@ type Item struct {
 	BonusType   int
 	Slot        int
 	BonusAmount int
-	Tags        []string
+	Tags        []*Tag `gorm:"many2many:item_tags;ondelete:CASCADE;onupdate:CASCADE"`
+}
+
+type Tag struct {
+	gorm.Model
+	Name string
 }
 
 func CreateTestRingOfHealth() *Item {
 	return &Item{
-		Id:          uuid.New().String(),
 		Name:        "Ring of Health",
 		Description: "A shiny ring that boosts your health.",
 		Weight:      1,
@@ -45,13 +51,19 @@ func CreateTestRingOfHealth() *Item {
 		BonusType:   BONUS_TYPE_HEALTH,
 		Slot:        SLOT_RING,
 		BonusAmount: 5,
-		Tags:        []string{"health", "ring"},
+		Tags: []*Tag{
+			&Tag{
+				Name: "health",
+			},
+			&Tag{
+				Name: "ring",
+			},
+		},
 	}
 }
 
 func CreateTestRingOfMana() *Item {
 	return &Item{
-		Id:          uuid.New().String(),
 		Name:        "Ring of Mana",
 		Description: "A shiny ring that boosts your mana.",
 		Weight:      1,
@@ -60,6 +72,13 @@ func CreateTestRingOfMana() *Item {
 		BonusType:   BONUS_TYPE_MANA,
 		Slot:        SLOT_RING,
 		BonusAmount: 1,
-		Tags:        []string{"mana", "ring"},
+		Tags: []*Tag{
+			&Tag{
+				Name: "mana",
+			},
+			&Tag{
+				Name: "ring",
+			},
+		},
 	}
 }

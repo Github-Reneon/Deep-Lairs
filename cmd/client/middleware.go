@@ -20,11 +20,6 @@ func AuthRequired(c *fiber.Ctx) error {
 
 func AlreadyAuth(c *fiber.Ctx) error {
 	// Check for the presence of the "Authorization" header
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		// redirect to game page
-		return c.Redirect("/app/game")
-	}
 	return c.Next()
 }
 
@@ -36,11 +31,19 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 	// Send custom error page
-	err = c.Status(code).Render("error", fiber.Map{
-		"Error":      err.Error(),
-		"StatusCode": code,
-		"Version":    protocol.CLIENT_VERSION,
-	})
+	if Prod {
+		err = c.Status(code).Render("error", fiber.Map{
+			"Error":      "We encountered an error processing your request.",
+			"StatusCode": code,
+			"Version":    protocol.CLIENT_VERSION,
+		})
+	} else {
+		err = c.Status(code).Render("error_dev", fiber.Map{
+			"Error":      err.Error(),
+			"StatusCode": code,
+			"Version":    protocol.CLIENT_VERSION,
+		})
+	}
 
 	if err != nil {
 		// In case the render fails

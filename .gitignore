@@ -7,3 +7,5 @@ node_modules/
 *.gz
 
 json/users/
+
+*.db
