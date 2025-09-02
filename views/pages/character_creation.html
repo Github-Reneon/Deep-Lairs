@@ -5,11 +5,19 @@
 <!-- tailwind fantasy theming -->
 
 <body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white antialiased">
+  {{ template "version_banner" . }}
   <div class="flex flex-col justify-center items-center">
     <div class="container flex flex-col items-center mt-12">
       <div
         class="w-full md:mx-4 bg-white dark:bg-gray-800 p-8 rounded shadow border-2 border-gray-500 dark:border-none dark:border-0 shadow-black shadow-lg mb-10">
         <div>
+          <a href="/app/character_select"
+            class="static left-1 top-1 w-10 h-10 bg-transparent hover:bg-gray-500 transition duration-100 ease-in-out rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+            </svg>
+          </a>
           <h2 class="text-2xl font-bold mb-6 text-center">Create Your Character</h2>
           <form action="/create_character" method="POST" class="space-y-6">
             <div

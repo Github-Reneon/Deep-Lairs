@@ -5,7 +5,7 @@
 {{ template "head" . }}
 
 <body class="bg-green-900 text-white h-screen">
-  <p class="absolute left-0 top-0 p-4 text-sm">Version {{ .Version }}</p>
+  {{ template "version_banner" . }}
   <div class="container mx-auto xl:pt-4 h-full">
     <div id="content" class="bg-gray-700 p-5 xl:rounded-t-3xl shadow-2xl shadow-black h-full flex flex-col">
       <h1 class="text-3xl font-bold mb-4 w-full bg-gray-700 flex-none">Deep Lairs</h1>

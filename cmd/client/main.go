@@ -50,14 +50,24 @@ func main() {
 	})
 
 	app.Get("/", GetIndex)
-	app.Get("/login", GetLogin)
-	app.Post("/login", PostLogin)
-	app.Get("/signup", GetSignup)
+	app.Get("/index", GetIndex)
+	app.Get("/login", func(c *fiber.Ctx) error { return c.Redirect("/auth/login") })
+	app.Get("/signup", func(c *fiber.Ctx) error { return c.Redirect("/auth/signup") })
+	app.Post("/login", func(c *fiber.Ctx) error { return c.Redirect("/auth/login") })
+	app.Post("/signup", func(c *fiber.Ctx) error { return c.Redirect("/auth/signup") })
+
+	auth := app.Group("/auth")
+	auth.Use(AlreadyAuth)
+
+	auth.Get("/login", GetLogin)
+	auth.Post("/login", PostLogin)
+	auth.Get("/signup", GetSignup)
 
 	game := app.Group("/app")
 	game.Use(AuthRequired)
 	game.Get("/game", GetGame)
 	game.Get("/character_creation", GetCharacterCreation)
+	game.Get("/character_select", GetCharacterSelect)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)

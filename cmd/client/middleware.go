@@ -18,6 +18,16 @@ func AuthRequired(c *fiber.Ctx) error {
 	return c.Next()
 }
 
+func AlreadyAuth(c *fiber.Ctx) error {
+	// Check for the presence of the "Authorization" header
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		// redirect to game page
+		return c.Redirect("/app/game")
+	}
+	return c.Next()
+}
+
 func ErrorHandler(c *fiber.Ctx, err error) error {
 	// Status code defaults to 500
 	code := fiber.StatusInternalServerError

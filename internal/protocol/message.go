@@ -6,9 +6,11 @@ const (
 )
 
 const (
-	CLIENT_VERSION = "0.1.0"
+	CLIENT_VERSION = "0.1.2"
 	SERVER_VERSION = "0.1.0"
 )
+
+const USER_NOT_FOUND = "user_not_found"
 
 const (
 	SERVER_PORT = ":3000"

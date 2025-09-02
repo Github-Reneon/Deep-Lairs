@@ -5,6 +5,7 @@
 {{ template "head" . }}
 
 <body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white antialiased">
+  {{ template "version_banner" . }}
   <div class="flex flex-col justify-center items-center">
     <div class="container flex flex-col items-center mt-12">
       <div
@@ -20,25 +21,37 @@
                 <label class="flex items-center space-x-4">
                   <input type="radio" name="character_id" value="{{ .ID }}" required
                     class="form-radio h-5 w-5 text-green-600">
-                  <div>
-                    <p class="font-bold text-lg">{{ .Name }} (Level {{ .Level }} {{ .Class }})</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Created on {{ .CreatedAt.Format "Jan 2, 2006" }}
+                  <div class="flex flex-row gap-3 items-center">
+                    <p class="font-bold text-lg">
+                      {{ .Name }} (Level {{ .Level }} {{ .Class }})
                     </p>
+                    <img src="/img/portraits/{{ .Image }}"
+                      class="mx-1 size-12 self-center rounded-xl shadow shadow-black dark:shadow-none" />
                   </div>
                 </label>
               </div>
-              {{ else }}
-              <p class="text-center text-gray-600 dark:text-gray-400">No characters found. Please create one first.</p>
               {{ end }}
             </div>
+            <a href="/app/character_creation"
+              class="flex items-center space-x-4 border border-dashed border-2 border-gray-400 rounded px-4 py-6 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-300">
+              <div class="flex flex-row gap-3 items-center">
+                <p class="font-bold text-lg">
+                  Create New Character
+                </p>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="size-8">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </div>
+            </a>
             <button type="submit"
               class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 opacity-100 starting:opacity-0 transition-opacity duration-1000 ease-in-out delay-600">
               Select Character</button>
           </form>
         </div>
       </div>
-      <a href="/create_character" class="text-sm text-blue-600 hover:underline mb-4">Create New Character</a>
-      <a href="/logout" class="text-sm text-red-600 hover:underline">Logout</a>
+      <a href="/auth/logout" class="text-sm text-red-600 hover:underline">Logout</a>
     </div>
   </div>
 </body>

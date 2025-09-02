@@ -36,9 +36,10 @@ type IFightable interface {
 }
 
 type UserFightable struct {
-	XP    int `json:"xp"`
-	MaxXP int `json:"max_xp"`
-	Level int `json:"level"`
+	XP    int    `json:"xp"`
+	MaxXP int    `json:"max_xp"`
+	Level int    `json:"level"`
+	Class string `json:"class"`
 	Fightable
 }
 
