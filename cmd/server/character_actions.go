@@ -242,7 +242,7 @@ func findItemState(character *gameobjects.Character, itemName string) (*gameobje
 	var foundItemState *gameobjects.ItemState
 	for _, ItemState := range character.ItemStates {
 		if ItemState.Item.Name == itemName {
-			foundItemState = &ItemState
+			foundItemState = ItemState
 			break
 		}
 	}
@@ -251,7 +251,7 @@ func findItemState(character *gameobjects.Character, itemName string) (*gameobje
 		for _, ItemState := range character.ItemStates {
 			for _, tag := range ItemState.Item.Tags {
 				if tag.Name == itemName {
-					foundItemState = &ItemState
+					foundItemState = ItemState
 					break
 				}
 			}

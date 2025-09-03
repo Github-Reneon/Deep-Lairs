@@ -17,17 +17,17 @@ import (
 var characterLocks sync.Map
 
 type Character struct {
-	ID             uuid.UUID   `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	Name           string      `gorm:"size:255"`
-	LastName       string      `gorm:"size:255"`
-	Location       *Place      `gorm:"-"`
-	KnownLocations []*Place    `gorm:"-"`
-	LocationId     string      `gorm:"index"`
-	MessageQueue   []string    `gorm:"-"`
-	Looked         bool        `gorm:"-"`
-	Busy           bool        `gorm:"-"`
-	changed        bool        `gorm:"-"`
-	fighting       *IFightable `gorm:"-"`
+	ID             uuid.UUID
+	Name           string
+	LastName       string
+	Location       *Place
+	KnownLocations []*Place
+	LocationId     string
+	MessageQueue   []string
+	Looked         bool
+	Busy           bool
+	changed        bool
+	fighting       *IFightable
 	CharacterFightable
 }
 
@@ -114,13 +114,13 @@ func (c *Character) GetState() string {
 	mu.Lock()
 	defer mu.Unlock()
 	ret := struct {
-		Type    string `json:"type"`
-		Name    string `json:"name"`
-		Health  string `json:"hp"`
-		MP      string `json:"mp"`
-		Stamina string `json:"stamina"`
-		XP      string `json:"xp"`
-		Combat  bool   `json:"combat"`
+		Type    string
+		Name    string
+		Health  string
+		MP      string
+		Stamina string
+		XP      string
+		Combat  bool
 	}{
 		Type:    protocol.STATE_TYPE_USER,
 		Name:    c.GetName(),
