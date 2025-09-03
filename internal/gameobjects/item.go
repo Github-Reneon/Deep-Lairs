@@ -1,8 +1,6 @@
 package gameobjects
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 const (
 	BONUS_TYPE_HEALTH = iota

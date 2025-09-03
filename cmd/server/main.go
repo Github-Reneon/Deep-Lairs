@@ -276,7 +276,7 @@ func loadWorld() {
 				continue
 			}
 			log.Println(place.ID, place.Name, place.JoiningLocationIds)
-			world.Places[place.ID] = &place
+			world.Places[place.ID.String()] = &place
 		}
 	}
 }

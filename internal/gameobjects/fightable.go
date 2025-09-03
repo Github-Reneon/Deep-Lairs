@@ -1,30 +1,30 @@
 package gameobjects
 
 type Fightable struct {
-	Health         int         `json:"-"`
-	MaxHealth      int         `json:"health"`
-	BaseMaxHealth  int         `json:"-"`
-	Attack         int         `json:"-"`
-	BaseAttack     int         `json:"attack"`
-	Defense        int         `json:"-"`
-	BaseDefense    int         `json:"defense"`
-	Mana           int         `json:"-"`
-	MaxMana        int         `json:"mana"`
-	BaseMaxMana    int         `json:"-"`
-	Stamina        int         `json:"-"`
-	MaxStamina     int         `json:"stamina"`
-	BaseMaxStamina int         `json:"-"`
-	Speed          int         `json:"-"`
-	BaseSpeed      int         `json:"speed"`
-	Int            int         `json:"-"`
-	BaseInt        int         `json:"intelligence"`
-	InCombat       bool        `json:"-"`
-	ItemStates     []ItemState `json:"item_states" gorm:"foreignKey:FightableID;constraint:onDelete:CASCADE,onUpdate:CASCADE"`
-	Image          string      `json:"image"`
+	Health         int
+	MaxHealth      int
+	BaseMaxHealth  int
+	Attack         int
+	BaseAttack     int
+	Defense        int
+	BaseDefense    int
+	Mana           int
+	MaxMana        int
+	BaseMaxMana    int
+	Stamina        int
+	MaxStamina     int
+	BaseMaxStamina int
+	Speed          int
+	BaseSpeed      int
+	Int            int
+	BaseInt        int
+	InCombat       bool
+	ItemStates     []*ItemState
+	Image          string
 }
 
 type ItemState struct {
-	Item     *Item `gorm:"foreignKey:ItemID;constraint:onDelete:CASCADE,onUpdate:CASCADE"`
+	Item     *Item
 	ItemID   uint
 	Slot     int
 	Equipped bool
@@ -49,13 +49,13 @@ func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed,
 	f.BaseSpeed = speed
 	f.Int = intelligence
 	f.BaseInt = intelligence
-	f.ItemStates = []ItemState{
-		ItemState{
+	f.ItemStates = []*ItemState{
+		{
 			Item:     CreateTestRingOfHealth(),
 			Slot:     SLOT_RING,
 			Equipped: false,
 		},
-		ItemState{
+		{
 			Item:     CreateTestRingOfMana(),
 			Slot:     SLOT_RING,
 			Equipped: false,

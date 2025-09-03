@@ -1,7 +1,6 @@
 package main
 
 import (
-	"deep_lairs/internal/gameobjects"
 	"deep_lairs/internal/protocol"
 
 	"gorm.io/driver/sqlite"
@@ -19,12 +18,8 @@ func initDBO() {
 }
 
 func createTables() {
-	// Migrate the schema
-	err := db.AutoMigrate(
-		&gameobjects.User{},
-		&gameobjects.Character{},
-	)
-	if err != nil {
-		panic("failed to migrate database")
+	// Ensure db is initialized
+	if db == nil {
+		panic("database connection is not initialized")
 	}
 }

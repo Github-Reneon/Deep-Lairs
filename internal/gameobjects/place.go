@@ -5,27 +5,29 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var placeLocks sync.Map
 
 type Place struct {
-	ID                    string                `json:"id"`
-	Name                  string                `json:"name"`
-	Description           string                `json:"description"`
-	Characters            map[string]*Character `json:"-"`
-	Look                  string                `json:"look"`
-	TitleLook             string                `json:"title_look"`
-	LookImage             string                `json:"look_image"`
-	LocationImage         string                `json:"location_image"`
-	Messages              []string              `json:"-"`
-	Jingles               []string              `json:"jingles"`
-	JoiningLocations      map[string]*Place     `json:"-"`
-	JoiningLocationIds    map[string]string     `json:"joining_location_ids"`
-	JoiningMessage        string                `json:"joining_message"`
-	LeavingMessage        string                `json:"leaving_message"`
-	Quests                []Quest               `json:"quests,omitempty"`
-	HiddenLocationMessage string                `json:"hidden_location_message,omitempty"`
+	ID                    uuid.UUID
+	Name                  string
+	Description           string
+	Characters            map[string]*Character
+	Look                  string
+	TitleLook             string
+	LookImage             string
+	LocationImage         string
+	Messages              []string
+	Jingles               []string
+	JoiningLocations      map[string]*Place
+	JoiningLocationIds    map[string]string
+	JoiningMessage        string
+	LeavingMessage        string
+	Quests                []Quest
+	HiddenLocationMessage string
 }
 
 func (p *Place) AddCharacterMessage(msg string, character *Character) {
