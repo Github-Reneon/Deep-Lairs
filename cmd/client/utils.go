@@ -63,12 +63,37 @@ func PutUserInMem(userName string) bool {
 	return true
 }
 
+func PutUserInMemFromUserObj(user gameobjects.User) {
+	LoadedUsers = append(LoadedUsers, LoadedUser{
+		Ttl:  time.Now().Add(time.Hour * 24),
+		User: user,
+	})
+}
+
 // gets a copy not the real deal
-func GetUserInMemFromName(userName string) (gameobjects.User, error) {
+func GetUserInMemFromName(userName string) (*gameobjects.User, error) {
 	for _, user := range LoadedUsers {
 		if user.Username == userName {
-			return user.User, nil
+			return &user.User, nil
 		}
 	}
-	return gameobjects.User{}, errors.New("Cannot find the user")
+	return nil, errors.New("Cannot find the user")
+}
+
+func GetUserInMemFromId(userId string) (*gameobjects.User, error) {
+	for _, user := range LoadedUsers {
+		if user.ID == userId {
+			return &user.User, nil
+		}
+	}
+	return nil, errors.New("Cannot find the user")
+}
+
+func GetUserInDboFromId(userId string) (*gameobjects.User, error) {
+	user, err := dbo.LoadUserFromId(userId)
+	if err != nil {
+		return nil, err
+	}
+	PutUserInMemFromUserObj(user)
+	return &user, err
 }

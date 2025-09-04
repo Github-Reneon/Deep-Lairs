@@ -5,6 +5,7 @@ import (
 	"deep_lairs/internal/gameobjects"
 	"deep_lairs/internal/protocol"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -154,4 +155,13 @@ func GetCharacterSelect(c *fiber.Ctx) error {
 		"Version":    protocol.CLIENT_VERSION,
 		"Characters": []gameobjects.Character{},
 	})
+}
+
+func PostLogout(c *fiber.Ctx) error {
+	c.Cookie(&fiber.Cookie{
+		Name:    protocol.COOKIE_USER_ID,
+		Expires: time.Now(),
+		Value:   "",
+	})
+	return c.Redirect("/")
 }

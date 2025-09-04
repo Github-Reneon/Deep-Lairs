@@ -20,6 +20,19 @@ func AuthRequired(c *fiber.Ctx) error {
 
 func AlreadyAuth(c *fiber.Ctx) error {
 	// Check for the presence of the "Authorization" header
+	id := ""
+	if id = c.Cookies(protocol.COOKIE_USER_ID, ""); id != "" {
+		return c.Status(fiber.StatusAlreadyReported).Redirect("/app/game")
+	}
+
+	if user, _ := GetUserInMemFromId(id); user == nil {
+		return c.Status(fiber.StatusAlreadyReported).Redirect("/app/game")
+	}
+
+	if user, _ := GetUserInDboFromId(id); user == nil {
+		return c.Status(fiber.StatusAlreadyReported).Redirect("/app/game")
+	}
+
 	return c.Next()
 }
 
