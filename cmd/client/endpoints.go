@@ -71,6 +71,16 @@ func PostSignup(c *fiber.Ctx) error {
 		})
 	}
 
+	hashedPassword := HashPassword(password)
+	if hashedPassword == "" {
+		return c.Status(fiber.StatusInternalServerError).Render("signup", fiber.Map{
+			"error": "Failed to hash password",
+		})
+	}
+	password = hashedPassword
+
+	log.Println("Creating user:", userName)
+
 	// check if user already exists in memory
 	if FindUserMem(userName) {
 		return c.Status(fiber.StatusBadRequest).Render("signup", fiber.Map{
@@ -93,13 +103,24 @@ func PostSignup(c *fiber.Ctx) error {
 	}
 
 	// load user into memory
-	if !GetUserInMem(userName) {
+	if !PutUserInMem(userName) {
 		return c.Status(fiber.StatusInternalServerError).Render("signup", fiber.Map{
 			"error": "Failed to load user into memory",
 		})
 	}
 
+	// confirm user created
+	user, err := GetUserInMemFromName(userName)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	log.Println("User created:", userName)
+
+	c.Cookie(&fiber.Cookie{
+		Name:  "user_id",
+		Value: user.ID,
+	})
 
 	// redirect to character select
 	return c.Redirect("/app/character_select")
