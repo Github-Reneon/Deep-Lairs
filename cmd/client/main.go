@@ -38,20 +38,13 @@ func main() {
 		Download: false,
 	})
 
-	setDboObjects()
+	InitDBO()
 	setCORS(app)
 	setUpRoutes(app)
 
 	if err := app.Listen(protocol.CLIENT_PORT); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
-}
-
-func setDboObjects() {
-	// initialize database connection
-	initDBO()
-	// create tables if they don't exist
-	createTables()
 }
 
 func setCORS(app *fiber.App) {
