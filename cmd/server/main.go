@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"deep_lairs/internal/dbo"
 	"deep_lairs/internal/gameobjects"
 	"deep_lairs/internal/protocol"
 
@@ -224,6 +225,8 @@ func handleIncomingMessages(ctx context.Context, conn *websocket.Conn, character
 func main() {
 	http.HandleFunc("/ws", handleConnections)
 	fmt.Println("Server started on", protocol.SERVER_PORT)
+
+	dbo.InitDBO()
 
 	// cors allow all origins
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

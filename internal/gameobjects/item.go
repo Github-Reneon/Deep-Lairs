@@ -52,10 +52,10 @@ func CreateTestRingOfHealth() *Item {
 		Slot:        SLOT_RING,
 		BonusAmount: 5,
 		Tags: []*Tag{
-			&Tag{
+			{
 				Name: "health",
 			},
-			&Tag{
+			{
 				Name: "ring",
 			},
 		},
@@ -73,10 +73,10 @@ func CreateTestRingOfMana() *Item {
 		Slot:        SLOT_RING,
 		BonusAmount: 1,
 		Tags: []*Tag{
-			&Tag{
+			{
 				Name: "mana",
 			},
-			&Tag{
+			{
 				Name: "ring",
 			},
 		},

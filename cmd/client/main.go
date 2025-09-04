@@ -1,6 +1,7 @@
 package main
 
 import (
+	"deep_lairs/internal/dbo"
 	"deep_lairs/internal/protocol"
 	"fmt"
 	"os"
@@ -38,7 +39,7 @@ func main() {
 		Download: false,
 	})
 
-	InitDBO()
+	dbo.InitDBO()
 	setCORS(app)
 	setUpRoutes(app)
 
@@ -74,6 +75,7 @@ func setUpRoutes(app *fiber.App) {
 
 	auth.Get("/login", GetLogin)
 	auth.Post("/login", PostLogin)
+	auth.Post("/signup", PostSignup)
 	auth.Get("/signup", GetSignup)
 
 	game := app.Group("/app")

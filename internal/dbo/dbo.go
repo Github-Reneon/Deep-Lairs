@@ -1,13 +1,17 @@
-package main
+package dbo
 
 import (
 	"database/sql"
+	"deep_lairs/internal/protocol"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var db *sql.DB
+
 func InitDBO() *sql.DB {
-	db, err := sql.Open("sqlite3", "./deep_lairs.db")
+	var err error
+	db, err = sql.Open("sqlite3", protocol.DBO_LOCATION)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -95,7 +99,7 @@ func initCharacters(db *sql.DB) (sql.Result, error) {
 		class TEXT,
 		date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
 		date_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(user_id) REFERENCES users(id) NOT NULL
+		FOREIGN KEY(user_id) REFERENCES users(id)
 	);
 	`
 	return db.Exec(sql)
@@ -149,7 +153,7 @@ func initFightables(db *sql.DB) (sql.Result, error) {
 		image TEXT,
 		date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
 		date_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(entity_fightable_id) REFERENCES entity_fightables(id) NOT NULL
+		FOREIGN KEY(entity_fightable_id) REFERENCES entity_fightables(id)
 	);
 	`
 	return db.Exec(sql)
@@ -198,7 +202,7 @@ func initItems(db *sql.DB) (sql.Result, error) {
 		slot_id INTEGER NOT NULL,
 		date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
 		date_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(bonus_type) REFERENCES lu_bonus_types(id) NOT NULL
+		FOREIGN KEY(bonus_type) REFERENCES lu_bonus_types(id)
 	);
 	`
 	return db.Exec(sql)
@@ -219,8 +223,8 @@ func initItemStates(db *sql.DB) (sql.Result, error) {
 		equipped BOOLEAN,
 		date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
 		date_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(fightable_id) REFERENCES fightables(id) NOT NULL,
-		FOREIGN KEY(item_id) REFERENCES items(id) NOT NULL
+		FOREIGN KEY(fightable_id) REFERENCES fightables(id)
+		FOREIGN KEY(item_id) REFERENCES items(id)
 	);
 	`
 	return db.Exec(sql)

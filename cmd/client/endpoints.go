@@ -1,8 +1,10 @@
 package main
 
 import (
+	"deep_lairs/internal/dbo"
 	"deep_lairs/internal/gameobjects"
 	"deep_lairs/internal/protocol"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -14,12 +16,6 @@ func GetGame(c *fiber.Ctx) error {
 	if Prod {
 		WebSocketURL = protocol.PROD_WS_LINK
 	}
-
-	/*
-		if c.Cookies("character_id", protocol.USER_NOT_FOUND) == protocol.USER_NOT_FOUND {
-			return c.Redirect("/app/character_select")
-		}
-	*/
 
 	return c.Render("game", fiber.Map{
 		"Version":      protocol.CLIENT_VERSION,
@@ -49,6 +45,64 @@ func GetSignup(c *fiber.Ctx) error {
 	return c.Render("signup", fiber.Map{
 		"Version": protocol.CLIENT_VERSION,
 	})
+}
+
+func PostSignup(c *fiber.Ctx) error {
+
+	log.Println("Signup request received")
+
+	if err := c.BodyParser(&struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}{}); err != nil {
+		return c.Status(fiber.StatusBadRequest).Render("signup", fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	userName := c.FormValue("username")
+	password := c.FormValue("password")
+	email := c.FormValue("email")
+
+	if userName == "" || password == "" || email == "" {
+		return c.Status(fiber.StatusBadRequest).Render("signup", fiber.Map{
+			"error": "All fields are required",
+		})
+	}
+
+	// check if user already exists in memory
+	if FindUserMem(userName) {
+		return c.Status(fiber.StatusBadRequest).Render("signup", fiber.Map{
+			"error": "User already exists",
+		})
+	}
+
+	// check if user already exists in database
+	if _, err := dbo.LoadUser(userName); err == nil {
+		return c.Status(fiber.StatusBadRequest).Render("signup", fiber.Map{
+			"error": "User already exists",
+		})
+	}
+
+	// create user in database
+	if err := dbo.CreateUser(userName, password, email); err != nil {
+		return c.Status(fiber.StatusInternalServerError).Render("signup", fiber.Map{
+			"error": "Failed to create user",
+		})
+	}
+
+	// load user into memory
+	if !GetUserInMem(userName) {
+		return c.Status(fiber.StatusInternalServerError).Render("signup", fiber.Map{
+			"error": "Failed to load user into memory",
+		})
+	}
+
+	log.Println("User created:", userName)
+
+	// redirect to character select
+	return c.Redirect("/app/character_select")
 }
 
 func PostLogin(c *fiber.Ctx) error {

@@ -50,12 +50,12 @@ func (f *Fightable) InitFightable(health, attack, defense, mana, stamina, speed,
 	f.Int = intelligence
 	f.BaseInt = intelligence
 	f.ItemStates = []ItemState{
-		ItemState{
+		{
 			Item:     CreateTestRingOfHealth(),
 			Slot:     SLOT_RING,
 			Equipped: false,
 		},
-		ItemState{
+		{
 			Item:     CreateTestRingOfMana(),
 			Slot:     SLOT_RING,
 			Equipped: false,
