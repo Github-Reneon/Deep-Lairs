@@ -1,0 +1,8 @@
+{{ define "logout_button" }}
+<form method="POST" action="/auth/logout" class="relative left-10 top-10 flex justify-end mb-2">
+  <button type="submit"
+    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    Logout
+  </button>
+</form>
+{{ end }}
