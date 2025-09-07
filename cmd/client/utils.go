@@ -28,6 +28,11 @@ func HashPassword(password string) string {
 	return string(hash)
 }
 
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func LoadedUserMemPruner() {
 	for {
 		time.Sleep(time.Millisecond * 100)

@@ -6,7 +6,7 @@ const (
 )
 
 const (
-	CLIENT_VERSION = "0.1.2"
+	CLIENT_VERSION = "0.1.5"
 	SERVER_VERSION = "0.1.0"
 )
 

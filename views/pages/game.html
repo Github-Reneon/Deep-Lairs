@@ -5,10 +5,7 @@
 {{ template "head" . }}
 
 <body class="bg-green-900 text-white h-screen">
-  {{ template "version_banner" . }}
-  {{ if .LoggedIn }}
-  {{ template "logout_button" . }}
-  {{ end }}
+  {{ template "top_info" . }}
   <div class="container mx-auto xl:pt-4 h-full">
     <div id="content" class="bg-gray-700 p-5 xl:rounded-t-3xl shadow-2xl shadow-black h-full flex flex-col">
       <h1 class="text-3xl font-bold mb-4 w-full bg-gray-700 flex-none">Deep Lairs</h1>

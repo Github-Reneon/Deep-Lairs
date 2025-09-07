@@ -1,0 +1,10 @@
+{{ define "top_info" }}
+<div class="absolute top-0 left-0 w-full p-4">
+  <div class="flex justify-between items-center flex-row">
+    {{ template "version_banner" . }}
+    {{ if .LoggedIn }}
+    {{ template "logout_button" . }}
+    {{ end }}
+  </div>
+</div>
+{{ end }}

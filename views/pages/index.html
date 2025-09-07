@@ -5,8 +5,8 @@
 {{ template "head" . }}
 
 <body class="bg-amber-50 text-gray-800 dark:bg-gray-900 dark:text-white">
-  {{ template "version_banner" . }}
   <div class="flex h-screen w-screen flex-col justify-center xl:flex-row xl:justify-evenly items-center">
+    {{ template "top_info" . }}
     <img src="/img/logo.webp" alt="Deep Lairs Logo" class="mb-4 w-100 h-100">
     <div>
       <h1
@@ -16,12 +16,19 @@
       <p class="mb-6 text-shadow text-shadow-black text-shadow-2xs dark:text-shadow-none">Embark on an epic text-based
         adventure!</p>
       <div class="flex justify-center xl:justify-normal">
+        {{ if .LoggedIn }}
+        <a href="/app/game" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition">Start Your
+          Journey</a>
+        {{ else }}
         <a href="/signup" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition">Start Your
           Journey</a>
+        {{ end }}
       </div>
+      {{ if eq false .LoggedIn}}
       <div class="mt-4 text-left">
         <a href="/login" class="text-sm text-blue-600 hover:underline">Already have an account? Login</a>
       </div>
+      {{ end }}
     </div>
   </div>
 </body>

@@ -71,17 +71,16 @@ func setUpRoutes(app *fiber.App) {
 	app.Post("/signup", func(c *fiber.Ctx) error { return c.Redirect("/auth/signup") })
 
 	auth := app.Group("/auth")
-	auth.Use(AlreadyAuth)
-
 	auth.Get("/login", GetLogin)
 	auth.Post("/login", PostLogin)
 	auth.Post("/signup", PostSignup)
 	auth.Get("/signup", GetSignup)
+	auth.Use(GetLoggedIn)
 
 	game := app.Group("/app")
 	game.Use(AuthRequired)
 	game.Get("/game", GetGame)
 	game.Get("/character_creation", GetCharacterCreation)
 	game.Get("/character_select", GetCharacterSelect)
-
+	game.Use(GetLoggedIn)
 }

@@ -18,6 +18,22 @@ func GetGame(c *fiber.Ctx) error {
 		WebSocketURL = protocol.PROD_WS_LINK
 	}
 
+	if c.Cookies("user_id") == "" {
+		return c.Redirect("/")
+	}
+
+	if c.Cookies("character_id") == "" {
+		return c.Redirect("/app/character_select")
+	}
+
+	user, err := GetUserInMemFromId(c.Cookies("user_id"))
+	if err != nil {
+		log.Println(err.Error())
+		return c.Redirect("/")
+	}
+
+	user.CurrentCharacterId = c.Cookies("character_id")
+
 	return c.Render("game", fiber.Map{
 		"Version":      protocol.CLIENT_VERSION,
 		"WebSocketURL": WebSocketURL,
@@ -25,10 +41,17 @@ func GetGame(c *fiber.Ctx) error {
 }
 
 func GetIndex(c *fiber.Ctx) error {
-	// set content type to html
+
+	LoggedIn := false
+
+	if c.Locals("LoggedIn") != nil {
+		LoggedIn = c.Locals("LoggedIn").(bool)
+	}
+
 	c.Set("Content-Type", "text/html")
 	return c.Render("index", fiber.Map{
-		"Version": protocol.CLIENT_VERSION,
+		"Version":  protocol.CLIENT_VERSION,
+		"LoggedIn": LoggedIn,
 	})
 }
 
@@ -132,10 +155,51 @@ func PostLogin(c *fiber.Ctx) error {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}{}); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).Render("login", fiber.Map{
 			"error": "Invalid request body",
 		})
 	}
+
+	userName := c.FormValue("username")
+	password := c.FormValue("password")
+
+	if userName == "" || password == "" {
+		return c.Status(fiber.StatusBadRequest).Render("login", fiber.Map{
+			"error": "Username and password are required",
+		})
+	}
+
+	log.Println("Login request received for user:", userName)
+
+	userMem, err := GetUserInMemFromName(userName)
+	if err != nil {
+		user, err := dbo.LoadUser(userName)
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).Render("login", fiber.Map{
+				"error": "Invalid username or password",
+			})
+		}
+		PutUserInMemFromUserObj(user)
+		userMem, err = GetUserInMemFromName(user.Username)
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).Render("login", fiber.Map{
+				"error": "Invalid username or password",
+			})
+		}
+	}
+
+	if !CheckPasswordHash(password, userMem.Password) {
+		return c.Status(fiber.StatusUnauthorized).Render("login", fiber.Map{
+			"error": "Invalid username or password",
+		})
+	}
+
+	log.Println("User logged in:", userName)
+
+	c.Cookie(&fiber.Cookie{
+		Name:  protocol.COOKIE_USER_ID,
+		Value: userMem.ID,
+	})
 
 	return c.Redirect("/app/character_select")
 }
